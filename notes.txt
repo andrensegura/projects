@@ -30,3 +30,5 @@ let x: String = diverges();
 ANYTHING BEFORE THIS LINE IS RUST BETA
 
 -----------------------
+
+testing
