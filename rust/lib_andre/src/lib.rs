@@ -1,5 +1,1 @@
-mod io;
-
-#[test]
-fn it_works() {
-}
+pub mod io;

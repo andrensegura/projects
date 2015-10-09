@@ -1,6 +1,5 @@
 extern crate lib_andre;
 
-use std::io::prelude::*;
 use std::io;
 use lib_andre::io::prompt;
 
