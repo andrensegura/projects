@@ -1,0 +1,145 @@
+#! /bin/bash
+
+
+#########################USAGE################
+read -r -d '' USAGE <<'EOF'
+-------------------------------------------------------------------------------
+Certified Hosting -- wlmodsec -- Usage
+
+This program will whitelist a ModSecurity rule for an entire cPanel user, or
+one of its domains.
+
+You must either supply ALL arguments or NO arguments:
+
+>wlmodsec -u (cpuser) -d (domain.com|none) -r (123456)
+
+>wlmodsec
+
+
+-Andre
+-------------------------------------------------------------------------------
+EOF
+##############################################
+
+
+
+#get info: username, domain, modsec rule
+
+if [ $# -eq 0 ]
+  then
+    read -e -p "cPanel Username          : " CPUSER    
+    read -e -p "Domain (blank for none)  : " DOMAIN
+    read -e -p "ModSec rule              : " RULEID
+  elif [ $# -eq 6 ]
+    then
+    while [[ $# > 1 ]]
+      do
+      key="$1"
+
+      case $key in
+          -u|--user)
+          CPUSER="$2"
+          shift
+          ;;
+          -d|--domain)
+          DOMAIN="$2"
+          shift
+          ;;
+          -r|--ruleid)
+          RULEID="$2"
+          shift
+          ;;
+          --default)
+          DEFAULT=YES
+          shift
+          ;;
+          *)
+                  # unknown option
+          ;;
+      esac
+      shift
+      done
+  else
+    echo "$USAGE"    
+fi
+
+
+#check input
+
+VALIDINPUT=0
+
+for i in /var/cpanel/users/*
+do
+    if [[ "${i##*/}" == "$CPUSER" ]]
+      then
+       VALIDINPUT=1
+       echo "Valid cPanel user." 
+    fi
+done
+
+if [ "$VALIDINPUT" == "0" ]
+  then
+    echo "Not a valid cPanel user."
+    exit 0
+fi
+
+
+
+
+
+#file to edit
+
+VALIDINPUT=0
+
+if [ "$DOMAIN" == "none" ] || [ "$DOMAIN" == "" ]
+  then
+    #FILE="/root/test/files/$CPUSER/modsec.conf"
+    FILE="/usr/local/apache/conf/userdata/std/2/$CPUSER/modsec.conf" #commented for development
+  else
+    for i in `grep -oE '[A-Za-z0-9.-]+\.[A-Za-z]{2,6}\b' /etc/httpd/conf/httpd.conf | sort | uniq`
+    do
+      if [ "$i" == "$DOMAIN" ]
+        then
+          VALIDINPUT=1
+          #FILE="/root/test/files/$CPUSER/$DOMAIN/modsec.conf"
+          FILE="/usr/local/apache/conf/userdata/std/2/$CPUSER/$DOMAIN/modsec.conf" #commented for development
+          echo "Valid domain."
+          break
+      fi
+    done
+  if [ "$VALIDINPUT" == "0" ]
+  then
+    echo "Not a valid domain."
+    exit 0
+  fi
+fi
+
+
+re='^[0-9]+$'
+if ! [[ $RULEID =~ $re ]] ; then
+   echo "Rule ID must be a number."
+   exit 0
+fi
+
+#check if file to edit exists
+if [ -f "$FILE" ]
+  then
+    #exists
+      #add rule
+    mv $FILE $FILE.bak
+    sed "2i\      SecRuleRemoveById $RULEID" $FILE.bak > $FILE
+    /scripts/rebuildhttpdconf
+  else
+    #else create a new one, add rule
+
+    if [ ! -d `echo /usr/local/apache/conf/userdata/std/2/$CPUSER/ | cut -d'/' -f1-9` ]
+      then
+        mkdir /usr/local/apache/conf/userdata/std/2/$CPUSER/
+    fi
+
+    touch $FILE
+    echo "<LocationMatch .*>" >> $FILE
+    echo "      SecRuleRemoveById $RULEID" >> $FILE
+    echo "</LocationMatch>" >> $FILE
+    /scripts/rebuildhttpdconf
+fi

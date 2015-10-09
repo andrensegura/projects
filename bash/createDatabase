@@ -1,0 +1,120 @@
+#! /bin/bash
+
+
+#########################USAGE################
+read -r -d '' USAGE <<'EOF'
+-------------------------------------------------------------------------------
+Certified Hosting -- createDatabase -- Usage
+
+>createDatabase (-u|--user) <USER> [-s|--suffix] <DB SUFFIX> [-c|--clean]
+
+If you do not supply a database suffix, then the program will create one.
+The "clean" option simply makes it easier for other programs to parse the output.
+
+Examples:
+
+>createDatabase -u andre
+
+db:   andre_db359
+user: andre_db359
+pass: 0IydP1hMDs2Cu178
+
+>createDatabase -u andre -s site
+
+db:   andre_site
+user: andre_site
+pass: 0IydP1hMDs2Cu178
+
+>createDatabase -c -u andre  (or createDatabase -u andre -c , whatever)
+
+andre_site
+andre_site
+0IydP1hMDs2Cu178
+
+-Andre
+-------------------------------------------------------------------------------
+EOF
+##############################################
+
+
+#####MAIN#####
+if [ $1 ] ; then
+        while [[ $# > 0 ]]
+          do
+          key="$1"
+
+          case $key in
+              -u|--user)
+              CPUSER="$2"
+              shift
+              ;;
+              -s|--suffix)
+              SUFFIX="$2"
+              shift
+              ;;
+              -c|--clean)
+              CLEAN="1"
+              ;;
+              *)
+                      # unknown option
+              ;;
+          esac
+          shift
+          done
+
+    #did it this way because this needs to work on non cPanel servers.
+    aNumber='^[0-9]+$'
+    if ! [[ `id -u $CPUSER` =~ $aNumber ]] || [ -z ${CPUSER+x} ] ; then
+        exit 0
+    fi
+
+    #evaluates to the null if SUFFIX is unset and substitutes the string "x" otherwise
+    if ! [ -z ${SUFFIX+x} ] ; then
+      db_user="$CPUSER"_"$SUFFIX"
+      db_name="$CPUSER"_"$SUFFIX"
+    else
+      DB_PREFIX=$CPUSER"_db"
+      RANGE=1000
+
+      number=$RANDOM
+      let "number %= $RANGE"
+
+
+      db_user=$DB_PREFIX$number
+      db_name=$DB_PREFIX$number
+    fi    
+
+    db_pass=`tr -cd '[:alnum:]' < /dev/urandom | fold -w16 | head -n1`
+
+    if mysql -e "CREATE DATABASE $db_name;"
+        then
+        mysql -e "CREATE USER '$db_user'@'localhost' IDENTIFIED BY '$db_pass';"
+        mysql -e "GRANT ALL ON $db_name.* TO '$db_user'@'localhost';"
+
+        if [ -d "/scripts" ]
+            then
+            /usr/local/cpanel/bin/dbmaptool $CPUSER --type mysql --dbs "$db_name" --dbusers "$db_user"
+        fi
+
+        if [ "$CLEAN" == "1" ]
+            then
+              echo $db_name
+              echo $db_user
+              echo $db_pass
+            else
+              echo "db:   "$db_name
+              echo "user: "$db_user
+              echo "pass: "$db_pass
+        fi
+
+        else
+        printf "\nThe generated database already exists, or something is wrong with MySQL.\n"
+        echo "db:   "$db_name
+        printf "\nTry the command again.\n\n"
+    fi
+
+
+else
+    echo "$USAGE"
+fi
+####ENDMAIN#####

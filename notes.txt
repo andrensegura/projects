@@ -1,0 +1,32 @@
+21 FEB 2015
+interesting thing cPanel does.
+there is /usr/bin/cc which is not part of the "compiler" group, but it's
+just a symlink to /usr/bin/gcc,  which is part of said group.
+had to `chown :compiler /usr/bin/cc` in order to use rusts compiler, rustc.
+
+-----------------------
+Good to remember:
+"We expected an integer, but we got (). () is pronounced unit, and is a special
+type in Rust's type system. In Rust, () is not a valid value for a variable of
+type i32. It's only a valid value for variables of the type (), which aren't
+very useful. Remember how we said statements don't return a value? Well,
+that's the purpose of unit in this case. The semicolon turns any expression
+into a statement by throwing away its value and returning unit instead."
+
+-----------------------
+panic! is a macro, similar to println!() that we've already seen. Unlike
+println!(), panic!() causes the current thread of execution to crash with the
+given message.
+
+Because this function will cause a crash, it will never return, and so it has
+the type '!', which is read "diverges." A diverging function can be used as
+any type:
+
+let x: i32 = diverges();
+let x: String = diverges();
+
+-----------------------
+
+ANYTHING BEFORE THIS LINE IS RUST BETA
+
+-----------------------

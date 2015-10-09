@@ -1,0 +1,9 @@
+#! /bin/bash
+
+if [[ `ps xal | grep defunct | grep php | awk '{print $4}'` ]]
+  then
+    ps xal | grep defunct | grep php | awk '{print $4}' | xargs kill -9
+    echo Headshot.
+  else
+    echo No Zombies.
+fi

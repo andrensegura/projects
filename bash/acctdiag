@@ -1,0 +1,323 @@
+#! /bin/bash
+
+#########################VARIABLES############
+
+DEFAULT=1
+INTERACTIVE=0
+
+#colors
+
+red='\033[0;31m'
+green='\033[0;32m'
+blue='\033[0;34m'
+NC='\033[0m'
+
+#########################END VARIABLES########
+
+
+
+
+
+#########################USAGE################
+read -r -d '' USAGE <<'EOF'
+-------------------------------------------------------------------------------
+Certified Hosting -- acctDiag -- Usage
+
+
+This tool is used to diagnose common issues with cPanel users.
+The program will make no changes to accounts, but will report
+issues that it finds, and perhaps make a recommendation about
+how to fix it.
+
+This is still a work in progress. Issues may be found, features may be added.
+Any bugs, issues, or feature requests can be sent to andre@certifiedhosting.com.
+
+
+>>SYNTAX:
+[~]# acctDiag CPUSER <-i> <-n> <-p> <-h> <-s>
+
+*************
+CPUSER          :       Must be a valid cPanel user. MUST BE FIRST ARGUMENT.
+-i              :       INTERACTIVE flag. Setting this flag will allow you
+                        make runtime decisions. Try it out. MUST BE 2nd ARG.
+*************
+-n              :       Check the amount of iNodes the account has.
+-p              :       Check file/directory Permissions.
+-h              :       Check for issues with a .Htaccess file.
+-s              :       Check if the account is Suspended.
+*************
+
+CPUSER must come first, -i must come second (optional).
+The rest may be in any order.
+
+You do not need to include any flags. By default, the program will have all
+flags set; setting one manually turns all others off.
+
+
+-Andre
+-------------------------------------------------------------------------------
+
+EOF
+#########################END USAGE############
+
+
+
+
+
+#########################FUNCTIONS############
+
+isValidUser() {
+        echo '-- Checking user ...'
+        aNumber='^[0-9]+$'
+        if ! [[ `id -u $1` =~ $aNumber ]] || [[ "$1" == "" ]] ; then
+                echo 'Not a valid user.'
+                exit 0
+        fi
+
+        echo "-- $1 is a valid user."
+}
+
+answersYes() {
+
+        if [ "`echo $1 |awk '{print tolower($0)}'`" == "y" ] || [ "`echo $1 |awk '{print tolower($0)}'`" == "yes" ]
+        then
+                return 0
+        else
+                return 1
+        fi
+
+}
+
+isAccountSuspended() {
+        echo -e "${blue}CHECKING FOR ACCOUNT SUSPENSION${NC}"
+
+
+        suspendedList=(`/bin/ls /var/cpanel/suspended`)
+        for i in ${suspendedList[@]} ; do
+                if [ "$i" == "$1" ] ; then
+                        echo -e "${red}User $1 is SUSPENDED.${NC}"
+                        echo `cat /var/cpanel/suspended/$1`
+                        echo ''
+                        return 0
+                fi
+        done
+
+        echo "User $1 not suspended."
+        echo ''
+}
+
+isOverInodes() {
+
+        FILE=$1.inodes.txt
+        TMP=$FILE.o
+
+
+        echo -e "${blue}CHECKING INODE COUNT${NC}"
+        echo "This may take some time..."
+
+        INODES=`find /home/$1/ | wc -l`
+        if [ "$INODES" -gt "250000" ] ; then
+                INODES="${red}$INODES${NC}"
+        fi
+
+        echo -e "Inodes found under /home/$1/: $INODES"
+
+        # $2 is the interactive flag
+        if [ "$2" == "1" ] ; then
+                echo ''
+                read -e -p "See breakdown of inode usage?   (y/n): " ANSWER
+                if answersYes $ANSWER ; then
+
+                        read -e -p "Do you want it saved to a file? (y/n): " ANSWER
+                        touch $TMP
+
+                        #progress bar. neat, huh?
+                        FILELIST=(`find /home/$1 -type d`)
+                        COUNT=0
+
+                        for i in ${FILELIST[@]} ; do
+                                echo -e "`find $i -type f | wc -l`\t$i" >> $TMP
+                                COUNT=`echo "$COUNT + 1" | bc`
+                                PROGRESS=`echo "$COUNT / ${#FILELIST[@]} * 100" | bc -l | cut -d'.' -f1`
+                                echo -ne "Progress: $PROGRESS%\t\r"
+                        done
+                        echo '' #the second echo is because the "progress echo" has no newline
+                        echo ''
+
+                        cat $TMP | sort -rn | tail -n +2 > $FILE 
+                        rm -f $TMP
+
+                        if ! answersYes $ANSWER ; then
+                                echo "Top 15 directories:"
+                                cat $FILE | head -15
+                                rm -f $FILE 
+                        fi
+                fi
+        fi
+
+        echo ''
+}
+
+checkFilePermissions() {
+        echo -e "${blue}CHECKING FILE PERMISSIONS${NC}"
+
+        FILE=$1.permissions.txt
+        TMP=$FILE.o
+
+        stat -c "%a %n" `find /home/$1 -type f -perm /g=w` | sort -r >> $TMP
+        cp $TMP $FILE
+
+        cat $TMP | awk '{print $1}' | uniq -c > $TMP.o
+        rm -f $TMP
+        mv $TMP.o $TMP
+
+
+        echo "Amount of files found writeable by group: `cat $FILE | wc -l`"
+        echo ''
+        printf "Amount\tPermissions\n"
+        ( while read -r i ; do
+                if [ "`echo $i | awk '{print $2}'`" == "777" ] ; then
+                        echo -ne "${red}"
+                        printf "%s\t%s\n" "`echo $i | awk '{print $1}'`" "`echo $i | awk '{print $2}'`"
+                        echo -ne "${NC}"
+                else
+                        printf "%s\t%s\n" "`echo $i | awk '{print $1}'`" "`echo $i | awk '{print $2}'`"
+                fi
+        done ) < $TMP
+        echo ''
+
+        # $2 is the interactive flag
+        if [ "$2" == "1" ] ; then
+                echo ''
+                read -e -p "Do you want to save it in a file?   (y/n): " ANSWER
+                if ! answersYes $ANSWER ; then
+                        rm -f $FILE
+                else
+                        echo "Breakdown saved to $FILE."
+                fi
+        else
+                rm -f $FILE
+        fi
+
+
+        echo ''
+        rm -f $TMP
+}
+
+htaccessIssues() {
+        echo -e "${blue}CHECKING FOR HTACCESS ISSUES${NC}"
+
+
+        FILE=$1.htaccess.txt
+
+        find /home/$1 -name ".htaccess" -exec grep -li "Options\|php_value\|AddHandler" {} \; > $FILE
+
+        if [[ -s $FILE ]] ; then
+                for i in `cat $FILE` ; do
+                        RESULT=`grep "Options\|php_value\|AddHandler" $i`
+                        if grep -iq sym $i ; then
+                                echo -ne "${red}" 
+                                printf "%s\t\t%s\n" "$RESULT" "$i"
+                                echo -ne "${NC}"
+                        else
+                                printf "%s\t\t%s\n" "$RESULT" "$i"
+                        fi
+                done
+        else
+                echo "No htaccess issues."
+        fi
+
+        if [ "$2" == "1" ] ; then
+                echo ''
+                read -e -p "Do you want to save it in a file?   (y/n): " ANSWER
+                if ! answersYes $ANSWER ; then
+                        rm -f $FILE
+                fi
+        else
+                rm -f $FILE
+        fi
+
+
+
+
+        echo ''
+}
+
+
+default() { 
+        isAccountSuspended $1 $2
+        isOverInodes $1 $2
+        checkFilePermissions $1 $2
+        htaccessIssues $1 $2
+}
+
+main() {
+
+        if isValidUser $1 ; then
+          CPUSER=$1
+        fi
+
+        #check second arg:
+
+        if [ "$2" == "-i" ] ; then
+          INTERACTIVE=1
+        fi
+
+        if [ "$INTERACTIVE" == "1" ] ; then  echo "-- Interactive flag set" ; fi 
+        echo ''
+
+        #check rest of args:
+
+        while [[ $# > 0 ]]
+                do
+                key="$1"
+
+                case $key in
+                        -h|--htaccess)
+                                htaccessIssues $CPUSER $INTERACTIVE
+                                DEFAULT=0
+                                ;;
+                        -p|--permissions)
+                                checkFilePermissions $CPUSER $INTERACTIVE
+                                DEFAULT=0
+                                ;;
+                        -s|--suspended)
+                                isAccountSuspended $CPUSER $INTERACTIVE
+                                DEFAULT=0
+                                ;;
+                        -n|--inodes)
+                                isOverInodes $CPUSER $INTERACTIVE
+                                DEFAULT=0
+                                ;;
+                        *)
+                                # unknown option
+                                ;;
+                esac
+                shift
+        done
+
+        if [ "$DEFAULT" -eq "1" ] ; then
+                default $CPUSER $INTERACTIVE
+        fi
+
+}
+
+
+
+##########################RUNTIME
+
+if [ $# -eq 0 ]; then
+    echo "$USAGE"
+    exit 1
+fi
+
+if [ "$(echo $1 | head -c 1)" == "-" ]; then
+    echo -e "\n${red}CPUSER MUST COME BEFORE OPTIONS.${NC}\n"
+    echo "$USAGE"
+    echo -e "\n${red}CPUSER MUST COME BEFORE OPTIONS.${NC}\n"
+    exit 1
+fi
+
+
+echo ''
+main "$@"

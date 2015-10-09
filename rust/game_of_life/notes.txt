@@ -1,0 +1,7 @@
+NOTES:
+    let grid = [[' '; 4]; 4];   //how to make multi d array
+    println!("{:?}\n{:?}\n{}", grid, grid[0], grid[0][0].to_string());  //printing array
+print results:
+[[' ', ' ', ' ', ' '], [' ', ' ', ' ', ' '], [' ', ' ', ' ', ' '], [' ', ' ', ' ', ' ']]
+[' ', ' ', ' ', ' ']
+   <--actually prints a space

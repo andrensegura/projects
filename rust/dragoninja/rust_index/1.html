@@ -1,0 +1,177 @@
+<p>
+Man, is this language different. Forcing you to check for errors makes the language pretty verbose 
+-- intimidating, really.
+The first <a href="http://reddit.com/r/DailyProgrammer">/r/DailyProgrammer</a> challenge is as follows:
+</p>
+
+
+<p><strong>
+Title: [easy] challenge #1<br>
+Text: create a program that will ask the users name, age, and reddit username. have it tell them the information back, in the format:<br>
+your name is (blank), you are (blank) years old, and your username is (blank)<br>
+for extra credit, have the program log this information in a file to be accessed later.
+</strong></p>
+
+<p>
+Really easy program. Should be a piece of cake! Well, even for something as trivial as this,
+we need to check for errors. Based on the book/reference for the 1.0 release of Rust, this is what I
+ended up writing:
+</p>
+
+<!-- HTML generated using hilite.me --><div style="background: #111111; overflow:auto;width:60%;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><table><tr><td><pre style="margin: 0; line-height: 125%"> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28</pre></td><td><pre style="margin: 0; line-height: 125%"><span style="color: #fb660a; font-weight: bold">use</span> <span style="color: #ffffff">std::io::prelude::*;</span>
+<span style="color: #fb660a; font-weight: bold">use</span> <span style="color: #ffffff">std::io;</span>
+
+<span style="color: #fb660a; font-weight: bold">fn</span> <span style="color: #ffffff">main()</span> <span style="color: #ffffff">{</span>
+    <span style="color: #fb660a; font-weight: bold">let</span> <span style="color: #fb660a; font-weight: bold">mut</span> <span style="color: #ffffff">name</span> <span style="color: #ffffff">=</span> <span style="color: #ffffff">String::new();</span>
+    <span style="color: #fb660a; font-weight: bold">let</span> <span style="color: #fb660a; font-weight: bold">mut</span> <span style="color: #ffffff">age</span> <span style="color: #ffffff">=</span> <span style="color: #ffffff">String::new();</span>
+    <span style="color: #fb660a; font-weight: bold">let</span> <span style="color: #fb660a; font-weight: bold">mut</span> <span style="color: #ffffff">username</span> <span style="color: #ffffff">=</span> <span style="color: #ffffff">String::new();</span>
+
+    <span style="color: #ffffff">print!(</span><span style="color: #0086d2">&quot;Name: &quot;</span><span style="color: #ffffff">);</span>                                           
+    <span style="color: #ffffff">io::stdout().flush().ok().expect(</span><span style="color: #0086d2">&quot;Could not flush stdout&quot;</span><span style="color: #ffffff">);</span> 
+    <span style="color: #ffffff">io::stdin().read_line(&amp;</span><span style="color: #fb660a; font-weight: bold">mut</span> <span style="color: #ffffff">name)</span>
+        <span style="color: #ffffff">.ok()</span>
+        <span style="color: #ffffff">.expect(</span><span style="color: #0086d2">&quot;Failed to read line!&quot;</span><span style="color: #ffffff">);</span>
+    <span style="color: #ffffff">print!(</span><span style="color: #0086d2">&quot;Age: &quot;</span><span style="color: #ffffff">);</span>
+    <span style="color: #ffffff">io::stdout().flush().ok().expect(</span><span style="color: #0086d2">&quot;Could not flush stdout&quot;</span><span style="color: #ffffff">);</span>
+    <span style="color: #ffffff">io::stdin().read_line(&amp;</span><span style="color: #fb660a; font-weight: bold">mut</span> <span style="color: #ffffff">age)</span>
+        <span style="color: #ffffff">.ok()</span>
+        <span style="color: #ffffff">.expect(</span><span style="color: #0086d2">&quot;Failed to read line!&quot;</span><span style="color: #ffffff">);</span>
+    <span style="color: #ffffff">print!(</span><span style="color: #0086d2">&quot;Reddit Username: &quot;</span><span style="color: #ffffff">);</span>
+    <span style="color: #ffffff">io::stdout().flush().ok().expect(</span><span style="color: #0086d2">&quot;Could not flush stdout&quot;</span><span style="color: #ffffff">);</span>
+    <span style="color: #ffffff">io::stdin().read_line(&amp;</span><span style="color: #fb660a; font-weight: bold">mut</span> <span style="color: #ffffff">username)</span>
+        <span style="color: #ffffff">.ok()</span>
+        <span style="color: #ffffff">.expect(</span><span style="color: #0086d2">&quot;Failed to read line!&quot;</span><span style="color: #ffffff">);</span>
+
+    <span style="color: #ffffff">println!(</span><span style="color: #0086d2">&quot;\nYour name: {}\nYour Age:{}\nYour Reddit Username: {}\n&quot;</span><span style="color: #ffffff">,</span>
+        <span style="color: #ffffff">name.trim(),</span> <span style="color: #ffffff">age.trim(),</span> <span style="color: #ffffff">username.trim());</span>
+
+<span style="color: #ffffff">}</span>
+</pre></td></tr></table></div>
+
+<p>
+So there are a few things that stand out here. The first thing is obviously how
+large this program is! You would think it would just be a few lines long, right?
+Something like this would only be like ten lines in C! Well, it wouldn't be the
+same program. It would act the same, but this one has the added effect of being
+<i>safe</i>. A 10 line C program wouldn't contain error checking. The second thing
+is this line, here:
+</p>
+
+<!-- HTML generated using hilite.me --><div style="background: #111111; overflow:auto;width:60%;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #ffffff">io::stdout().flush().ok().expect(</span><span style="color: #0086d2">&quot;Could not flush stdout&quot;</span><span style="color: #ffffff">);</span>
+</pre></div>
+
+
+<p>
+Using the println! macro flushes stdout for you, but print! does not. This information
+is found in the Rust <a href="https://doc.rust-lang.org/std/macro.print!.html">references</a>. The third thing that you probably noticed already
+is that this program looks like it was written by someone who doesn't understand
+the language. And, that's exactly right. I didn't write any functions and, on my
+post about this syntax Reddit, I even got called out for <i>purposely</i> making the program
+longer than it has to be. I assure you, this was simply due to my ingorance about the
+language and the type of code used in production." Here is an updated version, thanks
+to a kind redditor:
+</p>
+
+<!-- HTML generated using hilite.me --><div style="background: #111111; overflow:auto;width:60%;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><table><tr><td><pre style="margin: 0; line-height: 125%"> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28</pre></td><td><pre style="margin: 0; line-height: 125%"><span style="color: #fb660a; font-weight: bold">use</span> <span style="color: #ffffff">std::io::prelude::*;</span>
+<span style="color: #fb660a; font-weight: bold">use</span> <span style="color: #ffffff">std::io;</span>
+
+<span style="color: #fb660a; font-weight: bold">fn</span> <span style="color: #ffffff">main()</span> <span style="color: #ffffff">{</span>
+    <span style="color: #ffffff">try_main().unwrap();</span>
+<span style="color: #ffffff">}</span>
+
+<span style="color: #fb660a; font-weight: bold">fn</span> <span style="color: #ffffff">try_main()</span> <span style="color: #ffffff">-&gt;</span> <span style="color: #ffffff">Result&lt;(),</span> <span style="color: #ffffff">io::Error&gt;</span> <span style="color: #ffffff">{</span>
+    <span style="color: #fb660a; font-weight: bold">let</span> <span style="color: #ffffff">name</span> <span style="color: #ffffff">=</span> <span style="color: #ffffff">try!(prompt(</span><span style="color: #0086d2">&quot;Name: &quot;</span><span style="color: #ffffff">));</span>
+    <span style="color: #fb660a; font-weight: bold">let</span> <span style="color: #ffffff">age</span> <span style="color: #ffffff">=</span> <span style="color: #ffffff">try!(prompt(</span><span style="color: #0086d2">&quot;Age: &quot;</span><span style="color: #ffffff">));</span>
+    <span style="color: #fb660a; font-weight: bold">let</span> <span style="color: #ffffff">username</span> <span style="color: #ffffff">=</span> <span style="color: #ffffff">try!(prompt(</span><span style="color: #0086d2">&quot;Reddit Username: &quot;</span><span style="color: #ffffff">));</span>
+
+    <span style="color: #ffffff">println!(</span><span style="color: #0086d2">&quot;\n\</span>
+<span style="color: #0086d2">        Your name: {}\n\</span>
+<span style="color: #0086d2">        Your age: {}\n\</span>
+<span style="color: #0086d2">        Your Reddit username: {}\n\</span>
+<span style="color: #0086d2">        &quot;</span><span style="color: #ffffff">,</span> <span style="color: #ffffff">name,</span> <span style="color: #ffffff">age,</span> <span style="color: #ffffff">username);</span>
+
+    <span style="color: #ffffff">Ok(())</span>
+<span style="color: #ffffff">}</span>
+
+<span style="color: #fb660a; font-weight: bold">fn</span> <span style="color: #ffffff">prompt(ps:</span> <span style="color: #ffffff">&amp;</span><span style="color: #fb660a; font-weight: bold">str</span><span style="color: #ffffff">)</span> <span style="color: #ffffff">-&gt;</span> <span style="color: #ffffff">Result&lt;String,</span> <span style="color: #ffffff">io::Error&gt;</span> <span style="color: #ffffff">{</span>
+    <span style="color: #fb660a; font-weight: bold">let</span> <span style="color: #fb660a; font-weight: bold">mut</span> <span style="color: #ffffff">result</span> <span style="color: #ffffff">=</span> <span style="color: #ffffff">String::new();</span>
+    <span style="color: #ffffff">print!(</span><span style="color: #0086d2">&quot;{}&quot;</span><span style="color: #ffffff">,</span> <span style="color: #ffffff">ps);</span>
+    <span style="color: #ffffff">try!(io::stdout().flush());</span>
+    <span style="color: #ffffff">try!(io::stdin().read_line(&amp;</span><span style="color: #fb660a; font-weight: bold">mut</span> <span style="color: #ffffff">result));</span>
+    <span style="color: #ffffff">Ok(result)</span>
+<span style="color: #ffffff">}</span>
+</pre></td></tr></table></div>
+
+
+<p>
+This is much better. It puts it all into a function and makes the code more
+intuitive and readable. This isn't some kind of new thing, but I learned a little
+bit about the language from this problem (it ended being 28 lines both times, 
+anyway, haha). The biggest thing I took from my post on reddit was this:
+<p>
+
+<p><strong>"...you can't use that in main since main isn't allowed to return Err(...)."</strong></p>
+
+<p>
+I didn't know that. Nice.
+Also:
+<ul>
+<li>Rust does batch output (hence why you need to flush)</li>
+<li>try!</li>
+</ul>
+Nice.
+</p>

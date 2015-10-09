@@ -1,0 +1,118 @@
+#!/bin/bash
+# listreseller --  https://internalgit.icertified.net/git/rootscripts/
+#
+#Scripted by Andre Segura while working at Certified Hosting Solutions
+#Copyright (c) 2014, Certified Hosting.
+#All rights reserved.
+#Redistribution and use in source and binary forms, with or without
+#modification, are permitted provided that the following conditions are met: 
+#
+#1. Redistributions of source code must retain the above copyright notice, this
+#   list of conditions and the following disclaimer. 
+#2. Redistributions of source code must be in redacted form such that any private information,
+#   such as SSH keys, IP addresses, domain names, and URLS, are removed
+#
+#THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+#ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+#WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+#DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+#ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+#(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+#LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+#ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+#(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+#SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+#The views and conclusions contained in the software and documentation are those
+#of the authors and should not be interpreted as representing official policies, 
+#either expressed or implied, of Certified Hosting.
+#
+#################################################################################################
+# This script is intended for internal use at Certified Hosting and is not meant                #
+# for release to the public, however, everything may be re-released under a minimal             #
+# 2-Clause BSD or MIT type license given that any of our network info/credentials               #
+# are removed. This would include things such as SSH keys, IP addresses, domain names, and URLs.#
+# You may contact me for inquires via andre@certifiedhosting.com                                #
+#################################################################################################
+#
+
+
+# Notes:
+# 1. In code, please keep under 80 col if at all possible. There are exceptions
+#   i.e. URLs, here-docs, etc, but in general just keep it under 80 if you can.
+# 2. Please keep definitions of global variables in the variable section, and
+# keep all the 'runtime' stuff at the bottom. By 'runtime' I mean stuff that's
+# not in a function. This mainly applies to bash scripts.
+# 3. In bash, keep all the important runtime logic done in a _main function.
+# 4. Keep multi-line variables in here-docs, and use the bash bultin 'read' for
+# declaring the here-docs. Don't waste a call to cat(1) . 
+# 
+
+######################################################## BEGIN VARIABLE SECTION
+## USAGE
+read -r -d '' USAGE <<'EOF'
+-------------------------------------------------------------------------------
+Certified Hosting -- listreseller -- Usage
+
+Synopsis:
+		Only works on cPanel!
+		listreseller <RESELLER || RESELLERDOMAIN.COM >
+
+Examples:
+		listreseller resellerusername
+		listreseller resellerdomain.com
+		
+-Andre
+-------------------------------------------------------------------------------
+EOF
+##
+
+#########################################################  END VARIABLE SECTION
+
+
+
+
+
+
+
+_main (){
+
+	USERN=$(grep $1  "/etc/userdomains" | awk '{print $NF}' | awk 'NR==1')
+
+if [[ -z $USERN ]]
+then
+echo -e "$1 is not a reseller"
+
+exit 1
+
+fi
+
+OWNER=`cut -d: -f1  /var/cpanel/resellers | grep -o $USERN`
+exitstatus=$?
+
+if [ "$exitstatus" == 0 ] ; then
+echo  "=========================================================="
+echo -e  "Below are the accounts associated with the reseller $name"
+echo "=========================================================="
+
+output=$(for i in `grep $OWNER /var/cpanel/users/* -l` ; do grep USER= $i ; done | awk -F"=" '{ print $2 }')
+echo -e   "$output"
+else
+echo -e  "$1  is not  a Reseller"
+exit
+
+fi
+
+}
+
+
+
+######################################################### BEGIN RUNTIME SECTION
+if test $1
+then
+        _main $1
+else
+        echo "$USAGE"
+fi
+#########################################################   END RUNTIME SECTION
+

@@ -1,0 +1,48 @@
+#! /usr/bin/python
+
+
+import socket               # Import socket module
+import os
+import thread
+
+
+
+
+def connectClient(s):
+    c, addr = s.accept()     # Establish connection with client.
+    print 'New connection from', addr
+    c.send('Connected to server.')
+
+    while True:
+        message = c.recv(4096)
+        if message == '/logout':
+            print 'Logged out.', addr
+            break
+        print message
+
+    c.close()                # Close the connection
+
+
+
+
+
+os.system('cls' if os.name == 'nt' else 'clear')
+print "Server starting up.."
+
+sock = socket.socket()         # Create a socket object
+host = socket.gethostname() # Get local machine name
+port = 12346                # Reserve a port for your service.
+sock.bind((host, port))        # Bind to the port
+
+
+
+while True:
+    try:
+        sock.listen(5)                 # Now wait for client connection.
+        print "Listening for clients.."
+        thread.start_new_thread(connectClient, (sock, ))
+        thread.start_new_thread(connectClient, (sock, ))
+    except:
+        print "Error: unable to start thread"
+    while 1:
+        pass

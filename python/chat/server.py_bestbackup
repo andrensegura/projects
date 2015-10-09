@@ -1,0 +1,68 @@
+#! /usr/bin/python
+
+
+import socket               # Import socket module
+import os
+import thread
+
+
+newConnectionActive = False
+connectedClients = []
+
+
+
+def connectClient(s):
+    global newConnectionActive
+    global connectedClients
+
+    s.listen(5)                 # Now wait for client connection.
+    print "Listening for clients.."
+    c, addr = sock.accept()     # Establish connection with client.
+
+    newConnectionActive = True
+    connectedClients.append(c)
+
+    print 'New connection from', addr
+    c.send('Connected to server.')
+
+    while True:
+        message = c.recv(1024)
+        if message == '/logout':
+            print 'Logged out.', addr
+            break
+        for i in connectedClients:
+            i.send(message)
+        print message
+
+
+    connectedClients.remove(c)
+    c.close()                # Close the connection
+    return
+
+
+
+
+os.system('cls' if os.name == 'nt' else 'clear')
+print "Server starting up.."
+
+sock = socket.socket()         # Create a socket object
+host = socket.gethostname() # Get local machine name
+port = 12346                # Reserve a port for your service.
+sock.bind((host, port))        # Bind to the port
+
+amountThreads = 0
+
+try:
+    thread.start_new_thread(connectClient, (sock, ))
+except:
+    print "Error: unable to start thread"
+
+while True:
+    if newConnectionActive == True:
+        newConnectionActive = False
+        try:
+            thread.start_new_thread(connectClient, (sock, ))
+        except:
+            print "Error: unable to start thread"
+    else:
+        pass

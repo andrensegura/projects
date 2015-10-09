@@ -1,0 +1,39 @@
+"String" and "&str" are NOT THE SAME THING.
+
+
+##############################
+
+
+when doing a match on a String against something like "string",
+you need to call as_ref() on the String.
+like,
+
+match string_var {
+    "foo" => println!("bar"),
+    _ => println!("asdfasf"),
+}
+
+DOESN'T WORK.
+
+gotta do:
+
+match string_vari.as_ref() {
+    "foo" => println!("bar"),
+    _ => println!("asdfasf"),
+}
+
+
+##############################
+
+
+Rust docs say:
+
+"Safety note
+
+In general, because this function may panic, its use is discouraged.
+Instead, prefer to use pattern matching and handle the None case explicitly."
+
+How do?
+
+
+##############################

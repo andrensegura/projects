@@ -1,0 +1,4 @@
+[package]
+name = "fiboncacci_bunnies"
+version = "0.1.0"
+authors = ["andre"]
