@@ -1,5 +1,6 @@
-use std::io::prelude::*;
-use std::fs::File;
+extern crate lib_andre;
+
+use lib_andre::io::print_file;
 use std::error::Error;
 
 fn main() {
@@ -17,13 +18,3 @@ fn try_main() -> Result<(), Box<Error>>{
 
     Ok(())
 }
-
-fn print_file(file_name: &str) -> Result<String, Box<Error>> {
-    let mut f = try!(File::open(file_name));
-    let mut s = String::new();
-    try!(f.read_to_string(&mut s));
-    println!("{}", s);
-
-    Ok(s)
-}
-
