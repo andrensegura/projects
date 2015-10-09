@@ -1,0 +1,11 @@
+#wrote this for Jeff when he was looking for files that contained
+#the word "GLOBALS" over a certain number. nothing fancy.
+
+#! /bin/bash
+
+for i in `find ./ -type f -name "*.php" -exec grep -l GLOBALS {} \;` ; do 
+        MATCHES=`grep -o GLOBALS $i | wc -l`
+        if  [[ "$MATCHES" -gt "100" ]] ; then
+                echo "$MATCHES" -- $i
+        fi
+done
