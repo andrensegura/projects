@@ -164,7 +164,10 @@ checkFilePermissions() {
         FILE=$1.permissions.txt
         TMP=$FILE.o
 
-        stat -c "%a %n" `find /home/$1 -type f -perm /g=w` | sort -r >> $TMP
+        for i in `find /home/$1 -type f -perm /g=w` ; do
+                        stat -c "%a %n" $i | sort -r >> $TMP
+        done
+
         cp $TMP $FILE
 
         cat $TMP | awk '{print $1}' | uniq -c > $TMP.o
@@ -215,12 +218,12 @@ htaccessIssues() {
         if [[ -s $FILE ]] ; then
                 for i in `cat $FILE` ; do
                         RESULT=`grep "Options\|php_value\|AddHandler" $i`
-                        if grep -iq sym $i ; then
+                        if grep -iq "sym\|php_value" $i ; then
                                 echo -ne "${red}" 
-                                printf "%s\t\t%s\n" "$RESULT" "$i"
+                                printf "%s\t\t%s\n" "$RESULT" " $i"
                                 echo -ne "${NC}"
                         else
-                                printf "%s\t\t%s\n" "$RESULT" "$i"
+                                printf "%s\t\t%s\n" "$RESULT" " $i"
                         fi
                 done
         else
