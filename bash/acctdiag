@@ -217,10 +217,10 @@ htaccessIssues() {
 
         if [[ -s $FILE ]] ; then
                 for i in `cat $FILE` ; do
-                        RESULT=`grep "Options\|php_value\|AddHandler" $i`
+                        RESULT=`grep -P "^(\s*)(Options|php_(value|flag)|AddHandler)" $i`
                         if grep -iq "sym\|php_value" $i ; then
                                 echo -ne "${red}" 
-                                printf "%s\t\t%s\n" "$RESULT" " $i"
+                                printf "%s\n=============================\n%s\n\n" "$i" "$RESULT"
                                 echo -ne "${NC}"
                         else
                                 printf "%s\t\t%s\n" "$RESULT" " $i"
