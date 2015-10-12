@@ -210,26 +210,37 @@ checkFilePermissions() {
 htaccessIssues() {
         echo -e "${blue}CHECKING FOR HTACCESS ISSUES${NC}"
 
-
+    NL=$'\n'
+    REGEX="^(\s*)(Options|php_(value|flag)|AddHandler)"
         FILE=$1.htaccess.txt
 
-        find /home/$1 -name ".htaccess" -exec grep -li "Options\|php_value\|AddHandler" {} \; > $FILE
+        #this fills $FILE with the locations of the matches
+        find /home/$1 -name ".htaccess" -exec grep -P -li $REGEX {} \; > $FILE
 
         if [[ -s $FILE ]] ; then
+                #for every file found...
                 for i in `cat $FILE` ; do
-                        RESULT=`grep -P "^(\s*)(Options|php_(value|flag)|AddHandler)" $i`
-                        if grep -iq "sym\|php_value" $i ; then
-                                echo -ne "${red}" 
-                                printf "%s\n=============================\n%s\n\n" "$i" "$RESULT"
-                                echo -ne "${NC}"
-                        else
-                                printf "%s\t\t%s\n" "$RESULT" " $i"
-                        fi
+                        #...print the file name and...
+                        echo "-- $i"
+                        echo "======================================="
+                        #...print each line after deciding its severity.
+                        ( while NL= read -r line; do
+                            if grep -P -q "^#" <<< "$line" ; then
+                                    continue
+                            elif grep -P -iq "(Sym|php_(value|flag))" <<< "$line" ; then
+                                    echo -ne "${red}"
+                                    echo "$line"
+                                    echo -ne "${NC}"
+                            else
+                                    echo "$line"
+                            fi
+                            #echo "$line"
+                        done ) < "$i"
+                        echo ''
                 done
         else
                 echo "No htaccess issues."
         fi
-
         if [ "$2" == "1" ] ; then
                 echo ''
                 read -e -p "Do you want to save it in a file?   (y/n): " ANSWER
