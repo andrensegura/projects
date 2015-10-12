@@ -231,8 +231,10 @@ htaccessIssues() {
                                     echo -ne "${red}"
                                     echo "$line"
                                     echo -ne "${NC}"
-                            else
+                            elif grep -P $REGEX <<< "$line" ; then
                                     echo "$line"
+                            else
+                                    continue
                             fi
                             #echo "$line"
                         done ) < "$i"
