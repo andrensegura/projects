@@ -42,6 +42,7 @@ fn try_main() -> Result<(), Box<Error>> {
         println!("-- {} is a valid user.", user);
     } else {
         println!("-- {} is an INVALID user.", user);
+        return Ok(())
     }
 
     //now grabs the rest of the arguments.
@@ -49,20 +50,52 @@ fn try_main() -> Result<(), Box<Error>> {
         argument_flags.interactive = true;
         println!("-- INTERACTIVE flag set.");
     }
-
-//    for argument in args.clone() {
-//        match argument.as_ref() {
-//            "-i" => println!("-- INTERACTIVE flag set."),
-//            _ => ,
-//        }
-//    }
-
+    if args.contains(&"-p".to_string()) {
+        argument_flags.permissions = true;
+        //run the function for this.
+        try!(check_file_permissions(user.as_ref(), argument_flags.interactive));
+    }
+    if args.contains(&"-s".to_string()) {
+        argument_flags.suspended = true;
+        //run the function for this.
+        try!(check_suspension(user.as_ref(), argument_flags.interactive));
+    }
+    if args.contains(&"-h".to_string()) {
+        argument_flags.htaccess = true;
+        //run the function for this.
+        try!(check_htaccess_files(user.as_ref(), argument_flags.interactive));
+    }
+    if args.contains(&"-n".to_string()) {
+        argument_flags.inodes = true;
+        //run the function for this.
+        try!(check_inodes(user.as_ref(), argument_flags.interactive));
+    }
 
     Ok(())
 }
 
 
 
+fn check_file_permissions(user: &str, interactive: bool) -> Result<(), Box<Error>>{
+    println!("-- PERMISSIONS flag set. user:{} inter:{}", user, interactive);
+    Ok(())
+}
+
+
+fn check_suspension(user: &str, interactive: bool) -> Result<(), Box<Error>>{
+    println!("-- SUSPENSION flag set. user:{} inter:{}", user, interactive);
+    Ok(())
+}
+
+fn check_htaccess_files(user: &str, interactive: bool) -> Result<(), Box<Error>>{
+    println!("-- HTACCESS flag set. user:{} inter:{}", user, interactive);
+    Ok(())
+}
+
+fn check_inodes(user: &str, interactive: bool) -> Result<(), Box<Error>>{
+    println!("-- INODES flag set. user:{} inter:{}", user, interactive);
+    Ok(())
+}
 
 
 fn print_usage() {
