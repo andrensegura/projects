@@ -3,5 +3,5 @@ name = "challenge1"
 version = "0.1.0"
 authors = ["andre"]
 
-[dependencies.lib_andre]
-path = "/home/andre/projects/rust/lib_andre"
+[dependencies]
+lib_andre = { git = "https://github.com/andrensegura/lib_andre" , version = "0.1.0" }

@@ -20,11 +20,3 @@ fn try_main() -> Result<(), io::Error> {
 
     Ok(())
 }
-
-//fn prompt(ps: &str) -> Result<String, io::Error> {
-//    let mut result = String::new();
-//    print!("{}", ps);
-//    try!(io::stdout().flush());
-//    try!(io::stdin().read_line(&mut result));
-//    Ok(result)
-//}
