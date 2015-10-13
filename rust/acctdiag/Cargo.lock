@@ -1,0 +1,12 @@
+[root]
+name = "acctdiag"
+version = "0.1.0"
+dependencies = [
+ "lib_andre 0.1.0 (git+https://github.com/andrensegura/lib_andre)",
+]
+
+[[package]]
+name = "lib_andre"
+version = "0.1.0"
+source = "git+https://github.com/andrensegura/lib_andre#c9cf83c92feaa1b57c0dded52f5577d5c83176c4"
+
