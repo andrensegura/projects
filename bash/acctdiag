@@ -108,7 +108,7 @@ isAccountSuspended() {
 
 isOverInodes() {
 
-        FILE=$1.inodes.txt
+        FILE=/home/$1/$1.inodes.txt
         TMP=$FILE.o
 
 
@@ -161,7 +161,7 @@ isOverInodes() {
 checkFilePermissions() {
         echo -e "${blue}CHECKING FILE PERMISSIONS${NC}"
 
-        FILE=$1.permissions.txt
+        FILE=/home/$1/$1.permissions.txt
         TMP=$FILE.o
 
         for i in `find /home/$1 -type f -perm /g=w` ; do
@@ -212,7 +212,7 @@ htaccessIssues() {
 
     NL=$'\n'
     REGEX="^(\s*)(Options|php_(value|flag)|AddHandler)"
-        FILE=$1.htaccess.txt
+        FILE=/home/$1/$1.htaccess.txt
 
         #this fills $FILE with the locations of the matches
         find /home/$1 -name ".htaccess" -exec grep -P -li $REGEX {} \; > $FILE
@@ -245,7 +245,7 @@ htaccessIssues() {
         fi
         if [ "$2" == "1" ] ; then
                 echo ''
-                read -e -p "Do you want to save it in a file?   (y/n): " ANSWER
+                read -e -p "Do you want to save offending matches to a file? (y/n): " ANSWER
                 if ! answersYes $ANSWER ; then
                         rm -f $FILE
                 fi
