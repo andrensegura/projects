@@ -50,25 +50,25 @@ fn try_main() -> Result<(), Box<Error>> {
         argument_flags.interactive = true;
         println!("-- INTERACTIVE flag set.");
     }
-    if args.contains(&"-p".to_string()) {
-        argument_flags.permissions = true;
-        //run the function for this.
-        try!(check_file_permissions(user.as_ref(), argument_flags.interactive));
-    }
     if args.contains(&"-s".to_string()) {
         argument_flags.suspended = true;
         //run the function for this.
         try!(check_suspension(user.as_ref(), argument_flags.interactive));
     }
-    if args.contains(&"-h".to_string()) {
-        argument_flags.htaccess = true;
-        //run the function for this.
-        try!(check_htaccess_files(user.as_ref(), argument_flags.interactive));
-    }
     if args.contains(&"-n".to_string()) {
         argument_flags.inodes = true;
         //run the function for this.
         try!(check_inodes(user.as_ref(), argument_flags.interactive));
+    }
+    if args.contains(&"-p".to_string()) {
+        argument_flags.permissions = true;
+        //run the function for this.
+        try!(check_file_permissions(user.as_ref(), argument_flags.interactive));
+    }
+    if args.contains(&"-h".to_string()) {
+        argument_flags.htaccess = true;
+        //run the function for this.
+        try!(check_htaccess_files(user.as_ref(), argument_flags.interactive));
     }
 
     Ok(())
