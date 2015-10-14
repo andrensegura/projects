@@ -1,31 +1,31 @@
-use std::process::Command;
-use std::env;
+use std::error::Error;
+use std::path::PathBuf;
+use std::fs::File;
+use std::io::prelude::*;
 
-fn main() { 
-    let args: Vec<_> = env::args().collect();
-    let user = args[1].clone();
 
-    println!("-- Checking user ...");
+fn main() {
+    let user = "employee";
     
-    if is_valid_user(user.as_ref()) {
-        println!("-- User is valid: {}", user);
-    } else {
-        println!("-- User in invalid: {}", user);
+    let mut suspend_file_path = PathBuf::from("/var/cpanel/suspended/");
+    suspend_file_path.push(user);
+    
+    match print_file(suspend_file_path.to_str().unwrap()) {
+        Ok(s) => println!("{} is SUSPENDED: {}", user, s),
+        Err(_) => println!("{} is not suspended.", user),
     }
+    
+    
+
 }
 
-fn is_valid_user(user: &str) -> bool {
-    let command = format!("{}{}", "id -u ", user);
-    let output = Command::new("sh")
-                            .arg("-c")
-                            .arg(command)
-                            .output()
-                            .unwrap_or_else(|e| { panic!("failed to execute process: {}", e) }); 
-    let output_str = String::from_utf8_lossy(&output.stdout);
 
-    if output_str.is_empty() {
-        false 
-    } else {
-        true
-    }
+pub fn print_file(file_name: &str) -> Result<String, Box<Error>> {
+    let mut f = try!(File::open(file_name));
+    let mut s = String::new();
+    try!(f.read_to_string(&mut s));
+    println!("{}", s);
+
+    Ok(s)
 }
+
