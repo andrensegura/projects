@@ -11,7 +11,8 @@ fn main() {
     suspend_file_path.push(user);
     
     match print_file(suspend_file_path.to_str().unwrap()) {
-        Ok(s) => println!("{} is SUSPENDED: {}", user, s),
+        //Ok(s) => println!("{} is SUSPENDED: {}", user, s),
+        Ok(s) => println!("{} is SUSPENDED.", user),
         Err(_) => println!("{} is not suspended.", user),
     }
     
@@ -24,7 +25,6 @@ pub fn print_file(file_name: &str) -> Result<String, Box<Error>> {
     let mut f = try!(File::open(file_name));
     let mut s = String::new();
     try!(f.read_to_string(&mut s));
-    println!("{}", s);
 
     Ok(s)
 }
