@@ -1,8 +1,11 @@
 extern crate lib_andre;
 
 use lib_andre::os::is_valid_user;
+use lib_andre::io::print_file;
+//use std::process::Command;
 use std::error::Error;
 use std::env;
+use std::path::PathBuf;
 
 
 struct Flags {
@@ -84,6 +87,16 @@ fn check_file_permissions(user: &str, interactive: bool) -> Result<(), Box<Error
 
 fn check_suspension(user: &str, interactive: bool) -> Result<(), Box<Error>>{
     println!("-- SUSPENSION flag set. user:{} inter:{}", user, interactive);
+
+    let mut suspend_file_path = PathBuf::from("/var/cpanel/suspended/");
+    suspend_file_path.push(user);
+
+    match print_file(suspend_file_path.to_str().unwrap()) {
+        Ok(s) => println!("{} is suspended: {}", user, s),
+        Err(_) => println!("{} is not suspended.", user),
+    }
+
+
     Ok(())
 }
 
@@ -96,6 +109,16 @@ fn check_inodes(user: &str, interactive: bool) -> Result<(), Box<Error>>{
     println!("-- INODES flag set. user:{} inter:{}", user, interactive);
     Ok(())
 }
+
+//fn get_command_output(command: String) -> String {
+//    let output = Command::new("sh")
+//                            .arg("-c")
+//                            .arg(command)
+//                            .output()
+//                            .unwrap_or_else(|e| { panic!("failed to execute process: {}", e) });
+//    String::from_utf8_lossy(&output.stdout).to_string()
+//}
+
 
 
 fn print_usage() {
