@@ -11,10 +11,10 @@ fn try_main() -> Result<(), Box<Error>>{
     println!("Content-type: text/html; charset=iso-8859-1\n");
 
     //header stuff
-    try!(print_file("/home/andre/domains/drago.ninja/header.html"));
+    println!("{}",try!(print_file("/home/andre/domains/drago.ninja/header.html")));
 
     //body stuff
-    try!(print_file("body.html"));
+    println!("{}", try!(print_file("body.html")));
 
     Ok(())
 }
