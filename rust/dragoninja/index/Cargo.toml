@@ -4,4 +4,4 @@ version = "0.1.0"
 authors = ["andre"]
 
 [dependencies]
-lib_andre = { git = "https://github.com/andrensegura/lib_andre" }
+lib_andre = { git = "https://github.com/andrensegura/lib_andre" , version = "0.1.1"}
