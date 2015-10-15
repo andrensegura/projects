@@ -1,7 +1,7 @@
 [package]
 name = "acctdiag"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Andre Segura <andrensegura@gmail.com>"]
 
 [dependencies]
-lib_andre = { git = "https://github.com/andrensegura/lib_andre" , version = "0.1.0" }
+lib_andre = { git = "https://github.com/andrensegura/lib_andre" , version = "0.1.1" }
