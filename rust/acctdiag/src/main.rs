@@ -1,5 +1,7 @@
 extern crate lib_andre;
+extern crate walkdir;
 
+use walkdir::WalkDir;
 use lib_andre::os::is_valid_user;
 use lib_andre::io::print_file;
 //use std::process::Command;
@@ -107,6 +109,25 @@ fn check_htaccess_files(user: &str, interactive: bool) -> Result<(), Box<Error>>
 
 fn check_inodes(user: &str, interactive: bool) -> Result<(), Box<Error>>{
     println!("-- INODES flag set. user:{} inter:{}", user, interactive);
+//    let path = "/home/".to_string() + user + "/";
+//    println!("Files: {}", WalkDir::new(path).into_iter().count());
+
+    let mut count = 0;
+    let mut homedir = PathBuf::from("/home/");
+    homedir.push(user);
+
+    for entry in WalkDir::new(&homedir) {
+        let entry = entry.unwrap();
+        count += 1;
+        if interactive {
+            println!("{}", entry.path().display());
+        }
+    }
+
+    println!("Files: {}", count);
+
+
+
     Ok(())
 }
 
