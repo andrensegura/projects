@@ -4,10 +4,12 @@ extern crate walkdir;
 use walkdir::WalkDir;
 use lib_andre::os::is_valid_user;
 use lib_andre::io::print_file;
+use lib_andre::io::prompt;
 //use std::process::Command;
 use std::error::Error;
 use std::env;
-use std::path::PathBuf;
+use std::path::{PathBuf, Path};
+use std::fs::metadata;
 
 
 struct Flags {
@@ -94,8 +96,8 @@ fn check_suspension(user: &str, interactive: bool) -> Result<(), Box<Error>>{
     suspend_file_path.push(user);
 
     match print_file(suspend_file_path.to_str().unwrap()) {
-        Ok(s) => println!("{} is suspended: {}", user, s),
-        Err(_) => println!("{} is not suspended.", user),
+        Ok(s) => println!("    {} is suspended: {}", user, s),
+        Err(_) => println!("    {} is not suspended.", user),
     }
 
 
@@ -109,26 +111,68 @@ fn check_htaccess_files(user: &str, interactive: bool) -> Result<(), Box<Error>>
 
 fn check_inodes(user: &str, interactive: bool) -> Result<(), Box<Error>>{
     println!("-- INODES flag set. user:{} inter:{}", user, interactive);
-//    let path = "/home/".to_string() + user + "/";
-//    println!("Files: {}", WalkDir::new(path).into_iter().count());
 
-    let mut count = 0;
     let mut homedir = PathBuf::from("/home/");
     homedir.push(user);
 
-    for entry in WalkDir::new(&homedir) {
-        let entry = entry.unwrap();
-        count += 1;
-        if interactive {
-            println!("{}", entry.path().display());
+    //not interactive, just give inodes.
+    if !interactive {
+        println!("    {} -- {}", try!(count_files(&homedir.as_path())), homedir.display());
+    //interactive. what do you want to do?
+    } else {
+        //it's difficult to access the chars in a string, so we convert it to a Vec
+        let response: Vec<char> = try!(prompt("    See breakdown of inode usage?: "))
+                                  .chars()
+                                  .collect();
+        //.to_lowercase returns an iterator that corresponds to the lower case equivalent.
+        //calling .next() returns Some(char), so we unwrap it.
+        //they want to see the breakdown.
+        if response[0].to_lowercase().next().unwrap() == 'y' {
+            let mut results = Vec::<(u32, String)>::new();
+            for entry in WalkDir::new(&homedir) {
+                let entry = entry.unwrap();
+                if try!(metadata(entry.path())).is_dir() {
+                    results.push( (try!(count_files(entry.path())) ,
+                                   entry.clone().path().to_str().unwrap().to_string())  );
+                }
+            }
+      
+            if results.is_empty() {
+                println!("No results found.");
+            } else {
+                let response: Vec<char> = try!(prompt("    Save it to a file?: "))
+                                  .chars()
+                                  .collect();
+                if response[0].to_lowercase().next().unwrap() != 'y' {
+                    println!("Top 15 results:");
+                    results.sort();
+                    results.reverse();
+                    let mut count = 0;
+                    for item in results {
+                        count += 1;
+                        println!("    {} -- {}", item.0, item.1);
+                        if count >=15 { break; }
+                    }
+                } else {
+                    println!("save to file");
+                }
+            }
+        //no breakdown. just print the inodes.
+        } else {
+            println!("{} -- {}", try!(count_files(&homedir.as_path())), homedir.display());
         }
     }
 
-    println!("Files: {}", count);
-
-
-
     Ok(())
+}
+
+fn count_files(dir: &Path) -> Result<u32, Box<Error>>{
+    let mut count = 0;
+    //you can discard the value by using "_"
+    for _ in WalkDir::new(&dir) {
+        count += 1;
+    }
+    Ok(count)
 }
 
 //fn get_command_output(command: String) -> String {
