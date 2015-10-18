@@ -3,13 +3,11 @@ extern crate walkdir;
 
 use walkdir::WalkDir;
 use lib_andre::os::is_valid_user;
-use lib_andre::io::prompt;
 //use lib_andre::io::print_file;
 //use std::process::Command;
 use std::error::Error;
 use std::env;
 use std::path::PathBuf;
-use std::path::Path;
 use std::fs::metadata;
 
 
@@ -70,66 +68,34 @@ fn try_main() -> Result<(), Box<Error>> {
 fn check_inodes(user: &str, interactive: bool) -> Result<(), Box<Error>>{
     println!("-- INODES flag set. user:{} inter:{}", user, interactive);
 
+    let mut count = 0;
     let mut homedir = PathBuf::from("/home/");
     homedir.push(user);
 
-    //not interactive, just give inodes.
-    if !interactive {
-        println!("{} -- {}", try!(count_files(&homedir.as_path())), homedir.display());
-    //interactive. what do you want to do?
-    } else {
-        //it's difficult to access the chars in a string, so we convert it to a Vec
-        let response: Vec<char> = try!(prompt("See breakdown of inode usage?: "))
-                                  .chars()
-                                  .collect();
-        //.to_lowercase returns an iterator that corresponds to the lower case equivalent.
-        //calling .next() returns Some(char), so we unwrap it.
-        //they want to see the breakdown.
-        if response[0].to_lowercase().next().unwrap() == 'y' {
-            let mut results = Vec::<(u32, String)>::new();
-            for entry in WalkDir::new(&homedir) {
-                let entry = entry.unwrap();
-                if try!(metadata(entry.path())).is_dir() {
-                    results.push( (try!(count_files(entry.path())) ,
-                                   entry.clone().path().to_str().unwrap().to_string())  );
-                }
-            }
-      
-            if results.is_empty() {
-                println!("No results found.");
+    for entry in WalkDir::new(&homedir) {
+        let entry = entry.unwrap();
+        count += 1;
+        if interactive {
+            //dont cut off the last part if the path is already a dir.
+            if try!(metadata(entry.path())).is_dir() {
+                println!("{}", entry.path().display());
+            //if its not a dir, then remove the tail end of the path,
+            //since we dont care about it.
             } else {
-                let response: Vec<char> = try!(prompt("Save it to a file?: "))
-                                  .chars()
-                                  .collect();
-                if response[0].to_lowercase().next().unwrap() != 'y' {
-                    println!("Top 15 results:");
-                    results.sort();
-                    results.reverse();
-                    let mut count = 0;
-                    for item in results {
-                        count += 1;
-                        println!("    {} -- {}", item.0, item.1);
-                        if count >=15 { break; }
-                    }
-                } else {
-                    println!("save to file");
-                }
+                //entry is Path object.
+                //.path() returns the actual path stored. ex: "/home/andre/file.txt
+                //.parent() gives the parent dir of that path. ex: Some("/home/andre")
+                //.unwrap() is to just get the string, and display formats it.
+                println!("{}", entry.path().parent().unwrap().display());
             }
-        //no breakdown. just print the inodes.
-        } else {
-            println!("{} -- {}", try!(count_files(&homedir.as_path())), homedir.display());
         }
     }
 
-    Ok(())
-}
+    println!("Files: {}", count);
 
-fn count_files(dir: &Path) -> Result<u32, Box<Error>>{
-    let mut count = 0;
-    for entry in WalkDir::new(&dir) {
-        count += 1;
-    }
-    Ok(count)
+
+
+    Ok(())
 }
 
 //fn get_command_output(command: String) -> String {
