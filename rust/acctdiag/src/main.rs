@@ -133,7 +133,7 @@ fn check_inodes(user: &str, interactive: bool) -> Result<(), Box<Error>>{
                 let entry = entry.unwrap();
                 if try!(metadata(entry.path())).is_dir() {
                     results.push( (try!(count_files(entry.path())) ,
-                                   entry.clone().path().to_str().unwrap().to_string())  );
+                                   entry.path().to_str().unwrap().to_string())  );
                 }
             }
       
