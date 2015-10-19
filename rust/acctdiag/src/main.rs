@@ -41,7 +41,7 @@ fn try_main() -> Result<(), Box<Error>> {
         return Ok(())
     }
 
-    //check the first argument. if it's not a user, print usage > exit.
+    //check the first argument. if it's not a user, print usage then exit.
     let user = args[1].clone();
 
     println!("-- Checking user ...");
@@ -52,31 +52,43 @@ fn try_main() -> Result<(), Box<Error>> {
         return Ok(())
     }
 
-    //now grabs the rest of the arguments.
+    //check args and run their functions if given.
     if args.contains(&"-i".to_string()) {
         argument_flags.interactive = true;
         println!("-- INTERACTIVE flag set.");
     }
     if args.contains(&"-s".to_string()) {
         argument_flags.suspended = true;
-        //run the function for this.
         try!(check_suspension(user.as_ref(), argument_flags.interactive));
     }
     if args.contains(&"-n".to_string()) {
         argument_flags.inodes = true;
-        //run the function for this.
         try!(check_inodes(user.as_ref(), argument_flags.interactive));
     }
     if args.contains(&"-p".to_string()) {
         argument_flags.permissions = true;
-        //run the function for this.
         try!(check_file_permissions(user.as_ref(), argument_flags.interactive));
     }
     if args.contains(&"-h".to_string()) {
         argument_flags.htaccess = true;
-        //run the function for this.
         try!(check_htaccess_files(user.as_ref(), argument_flags.interactive));
     }
+
+    //user given, but no function arguments.
+    //I originally wrote an if statement inside of this one to check the interactive
+    //flag so it would decide wether to run this with/without interactive, but both
+    //the with and without blocks ended up looking the same. Duh.
+    if !(   argument_flags.suspended 
+         && argument_flags.inodes 
+         && argument_flags.permissions
+         && argument_flags.htaccess ) {
+        //no functions, but interactive. run all with interactive
+        try!(check_suspension(user.as_ref(), argument_flags.interactive));
+        try!(check_inodes(user.as_ref(), argument_flags.interactive));
+        try!(check_file_permissions(user.as_ref(), argument_flags.interactive));
+        try!(check_htaccess_files(user.as_ref(), argument_flags.interactive));
+    }
+
 
     Ok(())
 }
@@ -159,7 +171,7 @@ fn check_inodes(user: &str, interactive: bool) -> Result<(), Box<Error>>{
             }
         //no breakdown. just print the inodes.
         } else {
-            println!("{} -- {}", try!(count_files(&homedir.as_path())), homedir.display());
+            println!("    {} -- {}", try!(count_files(&homedir.as_path())), homedir.display());
         }
     }
 

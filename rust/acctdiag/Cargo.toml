@@ -1,6 +1,6 @@
 [package]
 name = "acctdiag"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["Andre Segura <andrensegura@gmail.com>"]
 
 [dependencies]
