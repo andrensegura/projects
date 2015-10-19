@@ -1,0 +1,32 @@
+#! /bin/bash
+
+# this script assumes csf is installed and that you are running as the
+# root user. the script creates a file containing the ips it blocks if
+# you messed up using this (say you meant "100" but put "1"), just run:
+# for i in `cat /root/blockattackers.temp.txt` ; do csf -dr $i ; done
+#
+# the temp file gets overwritten each time you run this script.
+
+
+if [ $# -eq 0 ] ; then
+        echo "Requires integer argument."
+        echo "Argument is how many connections per IP are OK before it gets blocked."
+        echo "ex: blockattackers 30 #blocks all IPs with 30+ connections"
+        exit 0
+fi
+
+netstat -an | grep :80 | awk '{print $5}' | cut -d: -f1 | sort | uniq -c | sort -n > /root/ba.pre.temp.txt
+echo -n '' > blockattackers.temp.txt
+
+NL=$'\n'
+
+( while NL= read -r line; do
+        if [ "$(echo $line | awk '{print $1}')" -lt "$1" ] ; then
+                continue
+        fi
+        echo $line >> blockattackers.temp.txt
+        csf -d `echo $line | awk '{print $2}'`
+done ) < "/root/ba.pre.temp.txt"
+
+rm -f ba.pre.temp.txt
+echo -e "\nList of Connections per IP in file /root/blockattackers.temp.txt"
