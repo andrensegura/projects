@@ -3,13 +3,13 @@ extern crate walkdir;
 
 use walkdir::WalkDir;
 use lib_andre::os::is_valid_user;
-use lib_andre::io::print_file;
-use lib_andre::io::prompt;
+use lib_andre::io::{print_file, prompt};
 //use std::process::Command;
 use std::error::Error;
 use std::env;
 use std::path::{PathBuf, Path};
-use std::fs::metadata;
+use std::fs::{metadata, File};
+use std::io::Write;
 
 
 struct Flags {
@@ -79,9 +79,9 @@ fn try_main() -> Result<(), Box<Error>> {
     //flag so it would decide wether to run this with/without interactive, but both
     //the with and without blocks ended up looking the same. Duh.
     if !(   argument_flags.suspended 
-         && argument_flags.inodes 
-         && argument_flags.permissions
-         && argument_flags.htaccess ) {
+         | argument_flags.inodes 
+         | argument_flags.permissions
+         | argument_flags.htaccess ) {
         //no functions, but interactive. run all with interactive
         try!(check_suspension(user.as_ref(), argument_flags.interactive));
         try!(check_inodes(user.as_ref(), argument_flags.interactive));
@@ -133,13 +133,16 @@ fn check_inodes(user: &str, interactive: bool) -> Result<(), Box<Error>>{
     //interactive. what do you want to do?
     } else {
         //it's difficult to access the chars in a string, so we convert it to a Vec
-        let response: Vec<char> = try!(prompt("    See breakdown of inode usage?: "))
-                                  .chars()
-                                  .collect();
+        let response_breakdown: Vec<char> = try!(prompt("    See breakdown of inode usage?: "))
+                                            .chars()
+                                            .collect();
         //.to_lowercase returns an iterator that corresponds to the lower case equivalent.
         //calling .next() returns Some(char), so we unwrap it.
         //they want to see the breakdown.
-        if response[0].to_lowercase().next().unwrap() == 'y' {
+        if response_breakdown[0].to_lowercase().next().unwrap() == 'y' {
+            let response_file: Vec<char> = try!(prompt("    Save it to a file?: "))
+                                           .chars()
+                                           .collect();
             let mut results = Vec::<(u32, String)>::new();
             for entry in WalkDir::new(&homedir) {
                 let entry = entry.unwrap();
@@ -152,13 +155,11 @@ fn check_inodes(user: &str, interactive: bool) -> Result<(), Box<Error>>{
             if results.is_empty() {
                 println!("No results found.");
             } else {
-                let response: Vec<char> = try!(prompt("    Save it to a file?: "))
-                                  .chars()
-                                  .collect();
-                if response[0].to_lowercase().next().unwrap() != 'y' {
+                results.sort();
+                results.reverse();
+
+                if response_file[0].to_lowercase().next().unwrap() != 'y' {
                     println!("Top 15 results:");
-                    results.sort();
-                    results.reverse();
                     let mut count = 0;
                     for item in results {
                         count += 1;
@@ -166,7 +167,24 @@ fn check_inodes(user: &str, interactive: bool) -> Result<(), Box<Error>>{
                         if count >=15 { break; }
                     }
                 } else {
-                    println!("save to file");
+                    let mut file_path = PathBuf::from(homedir.as_path());
+                    file_path.push(user.to_string() + ".inodes.txt");
+                    let mut file = try!(File::create(file_path.clone()));
+
+                    //permission checking
+                    //let meta = try!(metadata(file_path));
+                    //println!("{:?}", meta.permissions());
+
+                    //could just print with this, that way I could write a function
+                    //that handles making the file, but the output is ugly:
+                    //try!(write!(file, "{:?}", results));
+                    //I could make a new variable and format it, then pass it to the
+                    //supposed function, I guess. Hrm.
+                    for item in results {
+                        try!(write!(file, "{} -- {}\n", item.0, item.1));
+                    }
+
+                    //println!("    Saved to {:?}", file_path);
                 }
             }
         //no breakdown. just print the inodes.
@@ -186,6 +204,19 @@ fn count_files(dir: &Path) -> Result<u32, Box<Error>>{
     }
     Ok(count)
 }
+
+//always convert the var to a string?
+//fn save_to_file(dir: PathBuf, username: &str, variable_to_print: ???) {
+//    let mut file_path = PathBuf::from(dir.as_path());
+//    file_path.push(username.to_string() + ".inodes.txt");
+//    let mut file = try!(File::create(file_path.clone()));
+//
+//    for item in results {
+//        try!(write!(file, "{} -- {}\n", item.0, item.1));
+//    }
+//    println!("    Saved to {:?}", file_path);
+//}
+
 
 //fn get_command_output(command: String) -> String {
 //    let output = Command::new("sh")
