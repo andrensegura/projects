@@ -7,6 +7,7 @@ use lib_andre::io::{print_file, prompt};
 //use std::process::Command;
 use std::error::Error;
 use std::env;
+use std::os::unix::fs::PermissionsExt;
 use std::path::{PathBuf, Path};
 use std::fs::{metadata, File};
 use std::io::Write;
@@ -78,7 +79,7 @@ fn try_main() -> Result<(), Box<Error>> {
     //I originally wrote an if statement inside of this one to check the interactive
     //flag so it would decide wether to run this with/without interactive, but both
     //the with and without blocks ended up looking the same. Duh.
-    if !(   argument_flags.suspended 
+    if !(  argument_flags.suspended 
          | argument_flags.inodes 
          | argument_flags.permissions
          | argument_flags.htaccess ) {
@@ -97,6 +98,55 @@ fn try_main() -> Result<(), Box<Error>> {
 
 fn check_file_permissions(user: &str, interactive: bool) -> Result<(), Box<Error>>{
     println!("-- PERMISSIONS flag set. user:{} inter:{}", user, interactive);
+
+    let mut homedir = PathBuf::from("/home/");
+    homedir.push(user);
+
+    let mut perms_vec = Vec::<(String, String)>::new(); 
+
+    for entry in WalkDir::new(&homedir) {
+        let entry = entry.unwrap();
+        let meta = try!(metadata(entry.path()));
+        let perm = meta.permissions();
+        perms_vec.push( (format!("{:o}", perm.mode()),
+                         entry.path().to_str().unwrap().to_string()) );
+    }
+
+    perms_vec.sort();
+
+//    println!("{:o}", perm.mode());
+
+    if perms_vec.is_empty() {
+        println!("No results found.");
+    } else {
+        for item in perms_vec {
+            let perm_values: Vec<char> = item.0.chars().collect();
+            //i want to find files writeable by group/anyone.
+            //the vec contains ['owner perms', 'group perms', 'everyone else perms']
+            //if perm_values[1] or [2] is equal to 2, 6, or 7, it's writeable by group
+            //or anyone.
+
+            //doing this with ifs would have been huge.
+            //still feel like i could collapse this.
+            match perm_values[1] {
+                '2' => println!("    {} -- {}", item.0, item.1),
+                '6' => println!("    {} -- {}", item.0, item.1),
+                '7' => println!("    {} -- {}", item.0, item.1),
+                 _  => {},
+            }
+            match perm_values[2] {
+                '2' => println!("    {} -- {}", item.0, item.1),
+                '6' => println!("    {} -- {}", item.0, item.1),
+                '7' => println!("    {} -- {}", item.0, item.1),
+                 _  => {},
+            }
+
+
+        }
+    }
+
+
+
     Ok(())
 }
 
@@ -171,9 +221,6 @@ fn check_inodes(user: &str, interactive: bool) -> Result<(), Box<Error>>{
                     file_path.push(user.to_string() + ".inodes.txt");
                     let mut file = try!(File::create(file_path.clone()));
 
-                    //permission checking
-                    //let meta = try!(metadata(file_path));
-                    //println!("{:?}", meta.permissions());
 
                     //could just print with this, that way I could write a function
                     //that handles making the file, but the output is ugly:
