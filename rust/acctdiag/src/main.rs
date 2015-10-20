@@ -102,50 +102,58 @@ fn check_file_permissions(user: &str, interactive: bool) -> Result<(), Box<Error
     let mut homedir = PathBuf::from("/home/");
     homedir.push(user);
 
-    let mut perms_vec = Vec::<(String, String)>::new(); 
+    let mut perms_vec = Vec::<(u32, String)>::new(); 
 
     for entry in WalkDir::new(&homedir) {
         let entry = entry.unwrap();
         let meta = try!(metadata(entry.path()));
-        let perm = meta.permissions();
-        perms_vec.push( (format!("{:o}", perm.mode()),
-                         entry.path().to_str().unwrap().to_string()) );
+        let mode = meta.permissions().mode();
+
+        //after lots of tinkering, i figured, duh, biwise and.
+        //I was also going to test if the value came out to be 2, 16, or 18,
+        //but duh, if it's over 0 then one of the flags are set.
+        if (mode & 0b00010010u32) > 0 {
+            //this was a bit ridiculous haha.
+            //it formats mode, which is a u32, into its octal value as a string,
+            //then we parse that string back into a u32. Is there no easier way
+            //to just convert a u32 into an octal u32?
+            perms_vec.push( ( format!("{:o}", mode).parse::<u32>().unwrap(),
+                            entry.path().to_str().unwrap().to_string()) );
+        }
     }
 
     perms_vec.sort();
 
-//    println!("{:o}", perm.mode());
-
     if perms_vec.is_empty() {
         println!("No results found.");
     } else {
-        for item in perms_vec {
-            let perm_values: Vec<char> = item.0.chars().collect();
-            //i want to find files writeable by group/anyone.
-            //the vec contains ['owner perms', 'group perms', 'everyone else perms']
-            //if perm_values[1] or [2] is equal to 2, 6, or 7, it's writeable by group
-            //or anyone.
-
-            //doing this with ifs would have been huge.
-            //still feel like i could collapse this.
-            match perm_values[1] {
-                '2' => println!("    {} -- {}", item.0, item.1),
-                '6' => println!("    {} -- {}", item.0, item.1),
-                '7' => println!("    {} -- {}", item.0, item.1),
-                 _  => {},
+        if interactive {
+            let response: Vec<char> = try!(prompt("    Save results to a file?: "))
+                                                .chars()
+                                                .collect();
+            if response[0].to_lowercase().next().unwrap() == 'y' {
+                try!(save_to_file(homedir, user, ".perms.txt", perms_vec));
+            }else{
+                let mut count = 0;
+                perms_vec.reverse();
+                println!("Showing 15 results:");
+                for item in perms_vec {
+                    println!("    {} -- {}", item.0, item.1);
+                    count += 1;
+                    if count >= 15 { break; }
+                }
+        }
+        }else{
+            let mut count = 0;
+            perms_vec.reverse();
+            println!("Showing 15 results:");
+            for item in perms_vec {
+                println!("    {} -- {}", item.0, item.1);
+                count += 1;
+                if count >= 15 { break; }
             }
-            match perm_values[2] {
-                '2' => println!("    {} -- {}", item.0, item.1),
-                '6' => println!("    {} -- {}", item.0, item.1),
-                '7' => println!("    {} -- {}", item.0, item.1),
-                 _  => {},
-            }
-
-
         }
     }
-
-
 
     Ok(())
 }
@@ -252,17 +260,18 @@ fn count_files(dir: &Path) -> Result<u32, Box<Error>>{
     Ok(count)
 }
 
-//always convert the var to a string?
-//fn save_to_file(dir: PathBuf, username: &str, variable_to_print: ???) {
-//    let mut file_path = PathBuf::from(dir.as_path());
-//    file_path.push(username.to_string() + ".inodes.txt");
-//    let mut file = try!(File::create(file_path.clone()));
-//
-//    for item in results {
-//        try!(write!(file, "{} -- {}\n", item.0, item.1));
-//    }
-//    println!("    Saved to {:?}", file_path);
-//}
+fn save_to_file(dir: PathBuf, username: &str, extension:
+                &str, vec: Vec<(u32, String)>)-> Result<(), Box<Error>>{
+    let mut file_path = PathBuf::from(dir.as_path());
+    file_path.push(username.to_string() + extension);
+    let mut file = try!(File::create(file_path.clone()));
+
+    for item in vec {
+        try!(write!(file, "{} -- {}\n", item.0, item.1));
+    }
+
+    Ok(())
+}
 
 
 //fn get_command_output(command: String) -> String {
