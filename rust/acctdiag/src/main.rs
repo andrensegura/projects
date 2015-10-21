@@ -105,7 +105,10 @@ fn check_file_permissions(user: &str, interactive: bool) -> Result<(), Box<Error
     let mut perms_vec = Vec::<(u32, String)>::new(); 
 
     for entry in WalkDir::new(&homedir) {
-        let entry = entry.unwrap();
+        let entry = match entry {
+            Ok(v) => v,
+            Err(_) => {continue;},
+        };
         let meta = try!(metadata(entry.path()));
         let mode = meta.permissions().mode();
 
@@ -134,24 +137,42 @@ fn check_file_permissions(user: &str, interactive: bool) -> Result<(), Box<Error
             if response[0].to_lowercase().next().unwrap() == 'y' {
                 try!(save_to_file(homedir, user, ".perms.txt", perms_vec));
             }else{
-                let mut count = 0;
+                println!("Total files found: {}", perms_vec.len());
                 perms_vec.reverse();
-                println!("Showing 15 results:");
+                let mut count = 1;
+                let mut last = 0;
                 for item in perms_vec {
-                    println!("    {} -- {}", item.0, item.1);
-                    count += 1;
-                    if count >= 15 { break; }
+                    if item.0 == last {
+                        count += 1;
+                    }else{
+                        if count != 1 {
+                            println!("    Perms: {}\tAmt Files: {}", last, count);
+                            count = 1;
+                        }
+                        last = item.0;
+                    }
                 }
-        }
-        }else{
-            let mut count = 0;
-            perms_vec.reverse();
-            println!("Showing 15 results:");
-            for item in perms_vec {
-                println!("    {} -- {}", item.0, item.1);
-                count += 1;
-                if count >= 15 { break; }
+                println!("    Perms: {}\tAmt Files: {}", last, count);
             }
+        }else{
+            println!("Total files found: {}", perms_vec.len());
+            perms_vec.reverse();
+            let mut count = 1;
+            let mut last = 0;
+            //I feel like reading this block makes sense, but it took me a while
+            //to get it just right. Should I add comments? ...hmm. Probably.
+            for item in perms_vec {
+                if item.0 == last {
+                    count += 1;
+                }else{
+                    if count != 1 {
+                        println!("    Perms: {}\tAmt Files: {}", last, count);
+                        count = 1;
+                    }
+                    last = item.0;
+                }
+            }
+            println!("    Perms: {}\tAmt Files: {}", last, count);
         }
     }
 
