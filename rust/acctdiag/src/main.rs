@@ -1,3 +1,4 @@
+extern crate regex;
 extern crate lib_andre;
 extern crate walkdir;
 
@@ -10,7 +11,8 @@ use std::env;
 use std::os::unix::fs::PermissionsExt;
 use std::path::{PathBuf, Path};
 use std::fs::{metadata, File};
-use std::io::Write;
+use std::io::prelude::*;
+use regex::Regex;
 
 
 struct Flags {
@@ -105,6 +107,7 @@ fn check_file_permissions(user: &str, interactive: bool) -> Result<(), Box<Error
     let mut perms_vec = Vec::<(u32, String)>::new(); 
 
     for entry in WalkDir::new(&homedir) {
+        //if there's a problem, just skip it.
         let entry = match entry {
             Ok(v) => v,
             Err(_) => {continue;},
@@ -197,6 +200,30 @@ fn check_suspension(user: &str, interactive: bool) -> Result<(), Box<Error>>{
 
 fn check_htaccess_files(user: &str, interactive: bool) -> Result<(), Box<Error>>{
     println!("-- HTACCESS flag set. user:{} inter:{}", user, interactive);
+
+    let mut homedir = PathBuf::from("/home/");
+    homedir.push(user);
+
+    for entry in WalkDir::new(&homedir) {
+        let entry = match entry {
+            Ok(v) => v,
+            Err(_) => {continue;},
+        };
+        if entry.path().file_name().unwrap() == ".htaccess" {
+            //let re = Regex::new("^([:space:]*)(Options|php_(value|flag)|AddHandler)").unwrap();
+            let re = Regex::new("(?m)^(Options|php_(flag|value)|AddHandler)(.*)").unwrap();
+            let mut f = try!(File::open(entry.path()));
+            let mut buffer = String::new();
+            try!(f.read_to_string(&mut buffer));
+            if re.is_match(buffer.as_ref()) {
+                println!("    -- {}", entry.path().display());
+                let cap = re.captures(buffer.as_ref()).unwrap();
+                println!("      {}", cap.at(0).unwrap());
+            
+            }
+        }
+    }
+
     Ok(())
 }
 
@@ -224,7 +251,10 @@ fn check_inodes(user: &str, interactive: bool) -> Result<(), Box<Error>>{
                                            .collect();
             let mut results = Vec::<(u32, String)>::new();
             for entry in WalkDir::new(&homedir) {
-                let entry = entry.unwrap();
+                let entry = match entry {
+                    Ok(v) => v,
+                    Err(_) => {continue;},
+                };
                 if try!(metadata(entry.path())).is_dir() {
                     results.push( (try!(count_files(entry.path())) ,
                                    entry.path().to_str().unwrap().to_string())  );
