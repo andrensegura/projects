@@ -112,7 +112,10 @@ fn check_file_permissions(user: &str, interactive: bool) -> Result<(), Box<Error
             Ok(v) => v,
             Err(_) => {continue;},
         };
-        let meta = try!(metadata(entry.path()));
+        let meta = match metadata(entry.path()){
+            Ok(v) => v,
+            Err(_) => {continue;},
+        };
         let mode = meta.permissions().mode();
 
         //after lots of tinkering, i figured, duh, biwise and.
