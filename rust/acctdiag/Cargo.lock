@@ -1,6 +1,6 @@
 [root]
 name = "acctdiag"
-version = "0.2.2"
+version = "1.0.0"
 dependencies = [
  "lib_andre 0.1.1 (git+https://github.com/andrensegura/lib_andre)",
  "regex 0.1.41 (registry+https://github.com/rust-lang/crates.io-index)",

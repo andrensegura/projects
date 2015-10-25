@@ -213,16 +213,15 @@ fn check_htaccess_files(user: &str, interactive: bool) -> Result<(), Box<Error>>
             Err(_) => {continue;},
         };
         if entry.path().file_name().unwrap() == ".htaccess" {
-            //let re = Regex::new("^([:space:]*)(Options|php_(value|flag)|AddHandler)").unwrap();
-            let re = Regex::new("(?m)^(Options|php_(flag|value)|AddHandler)(.*)").unwrap();
+            let re = Regex::new("(?m)^(?P<val>(Options|php_(flag|value)|AddHandler)(.*))").unwrap();
             let mut f = try!(File::open(entry.path()));
             let mut buffer = String::new();
             try!(f.read_to_string(&mut buffer));
             if re.is_match(buffer.as_ref()) {
                 println!("    -- {}", entry.path().display());
-                let cap = re.captures(buffer.as_ref()).unwrap();
-                println!("      {}", cap.at(0).unwrap());
-            
+                for cap in re.captures_iter(buffer.as_ref()).collect::<Vec<_>>(){
+                    println!("      {}", cap.name("val").unwrap());
+                }
             }
         }
     }
