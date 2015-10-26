@@ -58,7 +58,7 @@ fn try_main() -> Result<(), Box<Error>> {
     //check args and run their functions if given.
     if args.contains(&"-i".to_string()) {
         argument_flags.interactive = true;
-        println!("-- INTERACTIVE flag set.");
+        println!("-- Flag '-i': Running in INTERACTIVE mode.");
     }
     if args.contains(&"-s".to_string()) {
         argument_flags.suspended = true;
@@ -99,7 +99,7 @@ fn try_main() -> Result<(), Box<Error>> {
 
 
 fn check_file_permissions(user: &str, interactive: bool) -> Result<(), Box<Error>>{
-    println!("-- PERMISSIONS flag set. user:{} inter:{}", user, interactive);
+    println!("-- Checking for excessive file permissions...");
 
     let mut homedir = PathBuf::from("/home/");
     homedir.push(user);
@@ -134,7 +134,7 @@ fn check_file_permissions(user: &str, interactive: bool) -> Result<(), Box<Error
     perms_vec.sort();
 
     if perms_vec.is_empty() {
-        println!("No results found.");
+        println!("    No results found.");
     } else {
         if interactive {
             let response: Vec<char> = try!(prompt("    Save results to a file?: "))
@@ -142,8 +142,9 @@ fn check_file_permissions(user: &str, interactive: bool) -> Result<(), Box<Error
                                                 .collect();
             if response[0].to_lowercase().next().unwrap() == 'y' {
                 try!(save_to_file(homedir, user, ".perms.txt", perms_vec));
+                println!("    Saved to /home/{0}/{0}.perms.txt", user);
             }else{
-                println!("Total files found: {}", perms_vec.len());
+                println!("    Total files found: {}", perms_vec.len());
                 perms_vec.reverse();
                 let mut count = 1;
                 let mut last = 0;
@@ -161,7 +162,7 @@ fn check_file_permissions(user: &str, interactive: bool) -> Result<(), Box<Error
                 println!("    Perms: {}\tAmt Files: {}", last, count);
             }
         }else{
-            println!("Total files found: {}", perms_vec.len());
+            println!("    Total files found: {}", perms_vec.len());
             perms_vec.reverse();
             let mut count = 1;
             let mut last = 0;
@@ -187,7 +188,7 @@ fn check_file_permissions(user: &str, interactive: bool) -> Result<(), Box<Error
 
 
 fn check_suspension(user: &str, interactive: bool) -> Result<(), Box<Error>>{
-    println!("-- SUSPENSION flag set. user:{} inter:{}", user, interactive);
+    println!("-- Checking suspension status...");
 
     let mut suspend_file_path = PathBuf::from("/var/cpanel/suspended/");
     suspend_file_path.push(user);
@@ -202,7 +203,7 @@ fn check_suspension(user: &str, interactive: bool) -> Result<(), Box<Error>>{
 }
 
 fn check_htaccess_files(user: &str, interactive: bool) -> Result<(), Box<Error>>{
-    println!("-- HTACCESS flag set. user:{} inter:{}", user, interactive);
+    println!("-- Checking for suPHP .htaccess conflicts...");
 
     let mut homedir = PathBuf::from("/home/");
     homedir.push(user);
@@ -230,7 +231,7 @@ fn check_htaccess_files(user: &str, interactive: bool) -> Result<(), Box<Error>>
 }
 
 fn check_inodes(user: &str, interactive: bool) -> Result<(), Box<Error>>{
-    println!("-- INODES flag set. user:{} inter:{}", user, interactive);
+    println!("-- Gathering inode information...");
 
     let mut homedir = PathBuf::from("/home/");
     homedir.push(user);
@@ -264,13 +265,13 @@ fn check_inodes(user: &str, interactive: bool) -> Result<(), Box<Error>>{
             }
       
             if results.is_empty() {
-                println!("No results found.");
+                println!("    No results found.");
             } else {
                 results.sort();
                 results.reverse();
 
                 if response_file[0].to_lowercase().next().unwrap() != 'y' {
-                    println!("Top 15 results:");
+                    println!("    Top 15 results:");
                     let mut count = 0;
                     for item in results {
                         count += 1;
@@ -278,21 +279,8 @@ fn check_inodes(user: &str, interactive: bool) -> Result<(), Box<Error>>{
                         if count >=15 { break; }
                     }
                 } else {
-                    let mut file_path = PathBuf::from(homedir.as_path());
-                    file_path.push(user.to_string() + ".inodes.txt");
-                    let mut file = try!(File::create(file_path.clone()));
-
-
-                    //could just print with this, that way I could write a function
-                    //that handles making the file, but the output is ugly:
-                    //try!(write!(file, "{:?}", results));
-                    //I could make a new variable and format it, then pass it to the
-                    //supposed function, I guess. Hrm.
-                    for item in results {
-                        try!(write!(file, "{} -- {}\n", item.0, item.1));
-                    }
-
-                    //println!("    Saved to {:?}", file_path);
+                    try!(save_to_file(homedir, user, ".inodes.txt", results));
+                    println!("    Saved to /home/{0}/{0}.inodes.txt", user);
                 }
             }
         //no breakdown. just print the inodes.
