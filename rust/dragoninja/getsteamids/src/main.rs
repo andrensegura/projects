@@ -50,7 +50,10 @@ fn print_body_content() -> Result<(), Box<Error>>{
     } else {
         try!(print_file("body.html"));
         println!("<div class=\"content\">List:<br>");
-        println!("<textarea type=\"text\" cols=\"50\" rows=\"10\" onclick=\"this.select()\">");
+
+        //this line makes it autohighlight all
+        //println!("<textarea type=\"text\" cols=\"50\" rows=\"10\" onclick=\"this.select()\">");
+        println!("<form><textarea type=\"text\" name=\"result\" cols=\"50\" rows=\"10\">");
 
         let split = query_string.split("%0D%0A");
 
@@ -63,7 +66,11 @@ fn print_body_content() -> Result<(), Box<Error>>{
         for item  in &list_vec {
             println!("* {}", item);
         }
-        println!("</textarea></div>");
+
+        println!("</textarea>");
+        println!("<br><input type=\"button\" value=\"Select All\"");
+        println!("onclick=\"javascript:this.form.result.focus();this.form.result.select();\">");
+        println!("</form></div>");
 
     }
 
