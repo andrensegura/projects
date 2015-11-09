@@ -48,11 +48,14 @@ fn print_body_content() -> Result<(), Box<Error>>{
         let file = query_string.clone() + ".html";
         let file_metadata = try!(fs::metadata(file.clone()));
         //check to see if the query is a valid file before checking the challenges
-        if file_metadata.is_file() {
+        if print_selector(match query_string.parse::<i32>(){
+                                Ok(val) => val,
+                                Err(_)  => -1,
+                          }) {
+            try!(print_file(file.as_ref())); 
+        }else if file_metadata.is_file() {
             try!(print_file(file.as_ref()));
         //now treat it like a challenge post
-        }else if print_selector(try!(query_string.parse::<i32>())) {
-            try!(print_file(file.as_ref())); 
         } else {
             try!(print_file("list.html"));
         }
@@ -68,7 +71,6 @@ fn print_selector(query: i32) -> bool {
                           .output()
                           .unwrap_or_else(|e| { panic!("failed to execute process: {}", e) });
     let latest = String::from_utf8_lossy(&output.stdout);
-
     //makes sure the query isn't out of bounds.
     //forgot to do this before.
     if query < 1 || query > latest.trim().parse::<i32>().unwrap() {
