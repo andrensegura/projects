@@ -1,0 +1,9 @@
+[package]
+name = "index"
+version = "0.1.0"
+authors = ["andre"]
+
+[dependencies]
+lib_andre = { git = "https://github.com/andrensegura/lib_andre" , version = "0.1.1"}
+regex = "0.1.41"
+curl = "0.2.13"
