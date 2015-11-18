@@ -81,13 +81,18 @@ fn print_friendly(line: &str) -> String{
     let mut line = line.to_string();
 
     //replace %3A with colon.
-    let re = Regex::new(r"%3A").unwrap();
+    let mut re = Regex::new(r"%3A").unwrap();
     let mut result = re.replace_all(line.as_ref(), ":");
+
+    //replace %26 with ampersand.
+    re = Regex::new(r"%26").unwrap();
+    result = re.replace_all(result.as_ref(), "&");
 
     //replace all remaining percent codes with nothing in
     //in the result string and the original.
-    let re = Regex::new(r"%[0-9A-F][0-9A-F]").unwrap();
+    re = Regex::new(r"%[0-9A-F][0-9A-F]").unwrap();
     result = re.replace_all(result.as_ref(), "");
+    //do it separately for line, as it will be used as a steam query.
     line = re.replace_all(line.as_ref(), "");
 
     //replace +'s with a space for the result.

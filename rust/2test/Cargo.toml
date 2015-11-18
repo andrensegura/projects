@@ -1,7 +1,0 @@
-[package]
-name = "2test"
-version = "0.1.0"
-authors = ["Andre Segura <andrensegura@gmail.com>"]
-
-[dependencies]
-walkdir = "0.1"

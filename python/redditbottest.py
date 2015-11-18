@@ -17,4 +17,5 @@ for thing in gen:
     subreddit = thing.subreddit.display_name
     karma_by_subreddit[subreddit] = (karma_by_subreddit.get(subreddit, 0) + thing.score)
 
-print karma_by_subreddit
+for item in karma_by_subreddit:
+    print "%s: %d" % (item, karma_by_subreddit.get(item))
