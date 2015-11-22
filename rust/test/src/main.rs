@@ -1,44 +1,50 @@
-extern crate ncurses;
+use std::thread::sleep_ms;
 
-use std::char;
-use ncurses::*;
+const CLEAR: &'static str = "\u{1B}[1;1H\u{1B}[2J";
 
-fn main()
-{
-  /* Setup ncurses. */
-  initscr();
-  raw();
+struct Player {
+    icon: char,
+    x: u8,
+    y: u8,
+}
 
-  /* Allow for extended keyboard (like F1). */
-  keypad(stdscr, true);
-  noecho();
+fn main() {
+    let mut map = [[' '; 15]; 15];
+    let mut player = Player { icon: '@', x: 6, y: 13 };
 
-  /* Prompt for a character. */
-  printw("Enter a character: ");
+    for _ in 1..10 {
+        set_entity(&mut map, &player);
+        draw_map(map);
+        sleep_ms(500);
+        clear_map(&mut map);
+        player.y -= 1;
+    }
 
-  /* Wait for input. */
-  let ch = getch();
-  if ch == KEY_F1
-  {
-    /* Enable attributes and output message. */
-    attron(A_BOLD() | A_BLINK());
-    printw("\nF1");
-    attroff(A_BOLD() | A_BLINK());
-    printw(" pressed");
-  }
-  else
-  {
-    /* Enable attributes and output message. */
-    printw("\nKey pressed: ");
-    attron(A_BOLD() | A_BLINK());
-    printw(format!("{}\n", char::from_u32(ch as u32).expect("Invalid char")).as_ref());
-    attroff(A_BOLD() | A_BLINK());
-  }
+}
 
-  /* Refresh, showing the previous message. */
-  refresh();
+fn clear() {
+    println!("{}", CLEAR);
+}
 
-  /* Wait for one more character before exiting. */
-  getch();
-  endwin();
+fn clear_map(grid: &mut [[char; 15];15]) {
+    for i in 0..grid.len() {
+        for j in 0..grid[i].len() {
+            grid[i][j] = ' ';
+        }
+    }
+}
+
+fn draw_map(grid: [[char; 15];15]) {
+    clear();
+    for i in 0..grid.len() {
+        for j in 0..grid[i].len() {
+            print!("{}", grid[i][j]);
+        }
+        println!("");
+    }
+}
+
+fn set_entity(grid: &mut [[char; 15];15], entity: &Player) {
+    grid[entity.y as usize][entity.x as usize] = entity.icon;
+
 }
