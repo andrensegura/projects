@@ -14,7 +14,7 @@ new_submissions = r.get_subreddit(SUBREDDIT).get_new(limit=LIMIT);
 for s in new_submissions:
     contains_search_item = any(string in s.title.lower() for string in SEARCH_FOR)
     if s.id not in already_done and contains_search_item:
-        print "%s: http://reddit.com/%s" % (s.title, s.id)
+        print("%s: http://reddit.com/%s" % (s.title, s.id))
         already_done.append(s.id)
         continue
         
@@ -27,7 +27,7 @@ for s in new_submissions:
             continue
         contains_search_item = any(string in c.body.lower() for string in SEARCH_FOR)
         if contains_search_item:
-            print "%s: http://reddit.com/%s" % (s.title, s.id)
-            print "comment: %s" % (c.body)
+            print("%s: http://reddit.com/%s" % (s.title, s.id))
+            print("comment: %s" % (c.body))
             already_done.append(c.id)
     already_done.append(s.id)
