@@ -26,8 +26,8 @@ def actually_find_stuff(root, sub, search_items, sort):
     if not sub or not search_items:
         return
 
-    textarea = Text(root, height=15, width=40)
-    textarea.grid(row=4, column=0, columnspan=3, sticky="news", padx=1, pady=1)
+    textarea = Text(root, height=20, width=40)
+    textarea.grid(row=4, column=0, columnspan=3, sticky="news", padx=2, pady=2)
     
     SUBREDDIT=sub
     SEARCH_FOR=search_items.split(',')
