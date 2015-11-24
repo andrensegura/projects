@@ -49,10 +49,14 @@ fn mysql_stuff() {
 //    println!("{}\n{}", db.db_name.unwrap(),
 //        database_toml.lookup("database.username").unwrap().as_str().unwrap());
 
-    let pool = MyPool::new(db).unwrap();
-    for mut stmt in pool.prepare(r"show databases;").into_iter() {
-        stmt.execute(()).unwrap();
-    }
+    let pool = match MyPool::new(db) {
+        Ok(p) => println!("{:?}", p),
+        Err(e) => println!("{}", e),
+    };
+//    for mut stmt in pool.prepare(r"show databases;").into_iter() {
+//        //stmt.execute(()).unwrap();
+//        println!("{:?}", stmt);
+//    }
 
 
 }
