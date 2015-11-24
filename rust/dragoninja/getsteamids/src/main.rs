@@ -43,11 +43,21 @@ fn print_file(file_name: &str) -> Result<String, Box<Error>> {
 }
 
 fn print_body_content() -> Result<(), Box<Error>>{
-    let query_string = try!(get_query_string());
+    let query_opts = try!(get_query_string());
 
-    if query_string == "" {
+    if query_opts.len() == 1{
         try!(print_file("body.html"));
     } else {
+        let format = query_opts[0].split("=").last().unwrap().to_string();
+        let advanced = query_opts[1].split("=").last().unwrap().to_string();
+        let query_string = query_opts[2].split("=").last().unwrap().to_string();
+
+        if query_string == "" {
+            try!(print_file("body.html"));
+            return Ok(());
+        }
+
+
         try!(print_file("body.html"));
         println!("<div class=\"content\">List:<br>");
 
@@ -59,12 +69,12 @@ fn print_body_content() -> Result<(), Box<Error>>{
 
         let mut list_vec: Vec<String> = Vec::new();
         for s in split {
-            list_vec.push(print_friendly(s));
+            list_vec.push(print_friendly(s, &format));
         }
 
         list_vec.sort();
         for item  in &list_vec {
-            println!("* {}", item);
+            println!("{}", item);
         }
 
         println!("</textarea>");
@@ -77,7 +87,7 @@ fn print_body_content() -> Result<(), Box<Error>>{
     Ok(())
 }
 
-fn print_friendly(line: &str) -> String{
+fn print_friendly(line: &str, format: &String) -> String{
     let mut line = line.to_string();
 
     //replace %3A with colon.
@@ -88,12 +98,19 @@ fn print_friendly(line: &str) -> String{
     re = Regex::new(r"%26").unwrap();
     result = re.replace_all(result.as_ref(), "&");
 
+    //replace %27 with apostrophe.
+    re = Regex::new(r"%27").unwrap();
+    result = re.replace_all(result.as_ref(), "'");
+    line = re.replace_all(line.as_ref(), "'"); //doing this so i can replace them later for correct searching
+
     //replace all remaining percent codes with nothing in
     //in the result string and the original.
     re = Regex::new(r"%[0-9A-F][0-9A-F]").unwrap();
     result = re.replace_all(result.as_ref(), "");
     //do it separately for line, as it will be used as a steam query.
     line = re.replace_all(line.as_ref(), "");
+    re = Regex::new(r"'").unwrap();
+    line = re.replace_all(line.as_ref(), "%27");
 
     //replace +'s with a space for the result.
     let re = Regex::new(r"\+").unwrap();
@@ -101,8 +118,11 @@ fn print_friendly(line: &str) -> String{
 
     line = get_app_url(line).unwrap();
 
-
-    format!("[{}]({})", result, line)
+    match format.as_ref() {
+        "reddit"  => format!("* [{}]({})", result, line),
+        "html"    => format!("<li><a href=\"{}\">{}</a><br>", line, result),
+        _         => "something went wrong".to_string(),
+    }
 }
 
 fn get_app_url(steam_query: String) -> Result<String, Box<Error>>{
@@ -123,14 +143,21 @@ fn get_app_url(steam_query: String) -> Result<String, Box<Error>>{
 
 }
 
-fn get_query_string() -> Result<String, Box<Error>> {
+fn get_query_string() -> Result<Vec<String>, Box<Error>> {
     let key = "QUERY_STRING";
     let query = match env::var(key) {
                     Ok(val) => val,
                     Err(e) => e.to_string(),
                 };
-    let split = query.split("list=");
+
+    let mut values: Vec<String> = Vec::new();
+    for option in query.split("&") {
+        values.push(option.to_string());
+    }
+    if values.len() == 2 {
+        values.insert(1, "advanced=false".to_string());
+    }
     
-    Ok(split.last().unwrap().to_string())
+    Ok(values)
 
 }
