@@ -35,5 +35,10 @@ password = form.getvalue("password", "")
 #DO STUFF WITH VARS
 #PRINT STUFF TO GET VARS
 if login(username, password):
-    print "Location: http://keycellar.drago.ninja/index.cgi"
+    result = mysql.execute_mysql("SELECT * FROM users WHERE username = '%s'" % (username))
+    if result[0][6] != "0":
+        print "Location: http://keycellar.drago.ninja/success.html"
+    else:
+        print "Location: http://keycellar.drago.ninja/index.cgi"
 print_login_form()
+
