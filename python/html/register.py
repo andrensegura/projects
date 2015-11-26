@@ -19,6 +19,11 @@ def register_user(user, email, passw, passw2):
         return "user"
     if not passw or (passw != passw2) or (len(passw) < 8):
        return "password"
+
+    pw_hash = pbkdf2_sha256.encrypt(passw, rounds=200000, salt_size=16)
+    mysql.execute_mysql( """INSERT INTO users (username, password, email)
+                          VALUES ('%s', '%s', '%s');"""
+                          % (user, pw_hash, email) )
     return "ok"
 
 #PRINT REGISTRATION FORM
