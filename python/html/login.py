@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 import mysql
-import cgi, os
+import cgi, os, string
 import Cookie, datetime
 import random
 import cgitb; cgitb.enable() #for troubleshooting

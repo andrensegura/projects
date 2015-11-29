@@ -2,7 +2,7 @@
 
 import mysql  #file i wrote
 import kcmail #file i wrote
-import re
+import re, string
 import random
 import cgi
 import cgitb; cgitb.enable() #for troubleshooting
