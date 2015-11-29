@@ -27,7 +27,8 @@ def register_user(user, email, passw, passw2):
        return "password"
 
     pw_hash = pbkdf2_sha256.encrypt(passw, rounds=200000, salt_size=16)
-    ver_key = ''.join(random.choice('0123456789ABCDEF') for i in range(16))
+    random.seed(passw)
+    key = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(16))
     mysql.execute_mysql( """INSERT INTO users (username, password, email, verified)
                           VALUES ('%s', '%s', '%s', '%s');"""
                           % (user, pw_hash, email, ver_key) )
