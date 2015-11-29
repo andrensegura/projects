@@ -84,7 +84,7 @@ def main():
         print_lo()
     elif not session or not session["session"].value:
         if login(username, password):
-            session = create_session(username)
+            session = create_session(username, password)
             print session.output()
             print_login_success(username)
             #print "Location: http://keycellar.drago.ninja/profile.cgi?user=%s&sess=%s" % (username, session)
