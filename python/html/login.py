@@ -21,12 +21,11 @@ def login(user, passw):
         return False
     return pbkdf2_sha256.verify(passw, result[0][1])
 
-def create_session(user):
+def create_session(user, passw):
     expires = datetime.datetime.now() + datetime.timedelta(days=3) 
     cookie = Cookie.SimpleCookie()
-    key = ''.join(random.choice(
-          '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxys'
-          ) for i in range(16))
+    random.seed(passw)
+    key = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(16)) 
     cookie["session"] = key
     cookie["session"]["domain"] = ".keycellar.drago.ninja"
     cookie["session"]["path"] = "/"
