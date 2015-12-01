@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import mysql
+import mysql, steam #files i wrote
 import cgi, os, string
 import Cookie, mycookie, datetime
 import random
@@ -86,6 +86,7 @@ def main():
                 mysql.execute_mysql("UPDATE users SET email = '%s' WHERE username = '%s';"
                         % (up_email, username) )
             if up_steam:
+                up_steam = steam.get_profile(up_steam)
                 mysql.execute_mysql("UPDATE users SET steam_profile = '%s' WHERE username = '%s';"
                         % (up_steam, username) )
             print "Location: http://keycellar.drago.ninja/u/%s\n" % (username)

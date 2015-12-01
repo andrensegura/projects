@@ -40,10 +40,11 @@ def print_profile(user, info):
 
     print "<br><b>Games Available for Trade:</b><br>"
     games_list = steam.get_inventory(info[4])
-    for game in games_list:
-#        print "%s<br>" % (game)
-        print """<li><a href="%s">%s</a><br>""" % (game[1], game[0])
-
+    if games_list:
+        for game in games_list:
+            print """<li><a href="%s">%s</a><br>""" % (game[1], game[0])
+    else:
+        print "No games in inventory or inventory is private."
 
 #GET VARIABLES
 form = cgi.FieldStorage()
