@@ -31,19 +31,19 @@ def register_user(user, email, passw, passw2):
     key = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(16))
     mysql.execute_mysql( """INSERT INTO users (username, password, email, verified)
                           VALUES ('%s', '%s', '%s', '%s');"""
-                          % (user, pw_hash, email, ver_key) )
-    kcmail.email_new_account(email, user, "http://keycellar.drago.ninja/register.cgi?verify=%s" % (ver_key))
+                          % (user, pw_hash, email, key) )
+    kcmail.email_new_account(email, user, "http://keycellar.drago.ninja/register.cgi?verify=%s" % (key))
     return "ok"
 
 #PRINT REGISTRATION FORM
 def print_registration_form():
     print "Content-type: text/html\n"
-    print_html_file("/home/andre/domains/drago.ninja/header.html")
+    print_html_file("header.html")
     print_html_file("register.html")
 
 def print_verification_success():
     print "Content-type: text/html\n"
-    print_html_file("/home/andre/domains/drago.ninja/header.html")
+    print_html_file("header.html")
     print_html_file("verified.html")
 
 #GET VARIABLES
@@ -62,7 +62,7 @@ if verify:
     mysql.execute_mysql("UPDATE users SET verified = '0' WHERE verified = '%s';" % (verify))
     print_verification_success()
 if r_result == "ok":
-    print "Location: http://keycellar.drago.ninja/success.html"
+    print "Location: http://keycellar.drago.ninja/u/faroeson"
 
 if not verify:
     print_registration_form()
