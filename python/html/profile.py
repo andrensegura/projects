@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import mysql
+import mysql, steam
 import Cookie, os
 import cgi
 import cgitb; cgitb.enable() #for troubleshooting
@@ -26,23 +26,30 @@ def owns_profile(u_info, key):
 #PRINT LOGIN FORM
 def print_profile(user, info):
     print "Content-type: text/html\n"
-    print_html_file("/home/andre/domains/drago.ninja/header.html")
+    print_html_file("header.html")
     print_html_file("profile.html")
     print """
 <table>
 <tr><td>Username:</td><td>%s</td></tr>
 <tr><td>Email:</td><td>%s (%s)</td></tr>
 <tr><td>Trades:</td><td>%s</td></tr>
-<tr><td>Game List:</td><td>%s</td></tr>
 <tr><td>Steam Profile:</td><td>%s</td></tr>
 </table>
 """ % (info[0], info[2], "verified" if info[6] == 0 else "not verified", 
-       info[5], info[3], info[4] )
+       info[5], info[4] )
+
+    print "<br><b>Games Available for Trade:</b><br>"
+    games_list = steam.get_inventory(info[4])
+    for game in games_list:
+#        print "%s<br>" % (game)
+        print """<li><a href="%s">%s</a><br>""" % (game[1], game[0])
+
 
 #GET VARIABLES
 form = cgi.FieldStorage()
 username = form.getvalue("user", "")
-session = form.getvalue("sess", "")
+up_email = form.getvalue("up_email", "")
+up_steam = form.getvalue("up_steam", "")
 
 #CHECK COOKIE
 session = Cookie.SimpleCookie()
@@ -59,10 +66,17 @@ except ((Cookie.CookieError, KeyError)):
 user_info = check_user(username)
 if user_info == "No such user here.":
     print "Content-type: text/html\n"
-    print_html_file("/home/andre/domains/drago.ninja/header.html")
-    print user_info
+    print_html_file("header.html")
+    print user_info #which is just "No such user here."
+elif not session:
+    print_profile(username, user_info)
 elif owns_profile(user_info, session["session"].value):
     print_profile(username, user_info)
-    print "<br>This is your profile!"
+    print """<br>
+             <h2>Update your settings:</h2>
+             <form method="post" action="http://keycellar.drago.ninja/login?action=update">"""
+    print """<input type="hidden" name="username" value="%s">""" % (username)
+    print_html_file("updatesettings.html")
+    print "</form>"
 else:
     print_profile(username, user_info)
