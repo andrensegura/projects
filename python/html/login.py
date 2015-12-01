@@ -2,7 +2,7 @@
 
 import mysql
 import cgi, os, string
-import Cookie, datetime
+import Cookie, mycookie, datetime
 import random
 import cgitb; cgitb.enable() #for troubleshooting
 from passlib.hash import pbkdf2_sha256
@@ -38,22 +38,22 @@ def create_session(user, passw):
 #PRINT LOGIN FORM
 def print_login_form(user, passw):
     print "Content-type: text/html\n"
-    print_html_file("/home/andre/domains/drago.ninja/header.html")
+    print_html_file("header.html")
     print_html_file("login.html")
     if user or passw:
         print "Invalid username or password."
 def print_login_success(user):
     print "Content-type: text/html\n"
-    print_html_file("/home/andre/domains/drago.ninja/header.html")
+    print_html_file("header.html")
     print_html_file("success.html")
     print """Proceed to your <a href="profile.cgi?user=%s">profile.</a>""" % (user)
 def print_logout(user):
     print "Content-type: text/html\n"
-    print_html_file("/home/andre/domains/drago.ninja/header.html")
+    print_html_file("header.html")
     print """<a href="login?action=logout">Logout(%s)</a>""" % (user)
 def print_lo():
     print "Content-type: text/html\n"
-    print_html_file("/home/andre/domains/drago.ninja/header.html")
+    print_html_file("header.html")
     print_html_file("logout.html")
 
 def main():
@@ -64,15 +64,11 @@ def main():
     action = form.getvalue("action", "")
 
     #CHECK COOKIE
-    session = Cookie.SimpleCookie()
-    try:
-        session.load(os.environ["HTTP_COOKIE"])
-        result = mysql.execute_mysql(
-                   "SELECT * FROM users WHERE logged_in = '%s'"
+    session = mycookie.get_cookie()
+    if session:
+        result = mysql.execute_mysql("SELECT * FROM users WHERE logged_in = '%s'"
                    % (session["session"].value))
         username = result[0][0] if result else username
-    except ((Cookie.CookieError, KeyError)):
-        session = ""
 
     #DO STUFF WITH VARS
     #PRINT STUFF TO GET VARS
@@ -82,15 +78,33 @@ def main():
         session["session"] = ""
         print session
         print_lo()
+    elif action == "update" and session:
+        if login(username,password):
+            up_email = form.getvalue("up_email", "")
+            up_steam = form.getvalue("up_steam", "")
+            if up_email:
+                mysql.execute_mysql("UPDATE users SET email = '%s' WHERE username = '%s';"
+                        % (up_email, username) )
+            if up_steam:
+                mysql.execute_mysql("UPDATE users SET steam_profile = '%s' WHERE username = '%s';"
+                        % (up_steam, username) )
+            print "Location: http://keycellar.drago.ninja/u/%s\n" % (username)
+            
+        else:
+            #change to redirect back to profile
+            print "Content-type: text/html\n"
+            print_html_file("header.html")
+            print "Invalid password!"
     elif not session or not session["session"].value:
         if login(username, password):
             session = create_session(username, password)
             print session.output()
-            print_login_success(username)
-            #print "Location: http://keycellar.drago.ninja/profile.cgi?user=%s&sess=%s" % (username, session)
+            print "Location: http://keycellar.drago.ninja/u/%s\n" % (username)
         else:
             print_login_form(username, password)
     elif session:
         print_logout(username)
+    else:
+        print_login_form(username,password)
 
 main()
