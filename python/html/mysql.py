@@ -1,11 +1,14 @@
 #!/usr/bin/python
 import MySQLdb
+import toml
 
 def execute_mysql(query):
-    db = MySQLdb.connect(host="localhost",      # your host, usually localhost
-                         user="andre_kc",       # your username
-                         passwd="7QS8R8cZ6azd", # your password
-                         db="andre_kc")         # name of the data base
+    with open("db.toml") as toml_file:
+        config = toml.loads(toml_file.read())
+    db = MySQLdb.connect(host   ="localhost",
+                         user   =config['database']['username'],
+                         passwd =config['database']['password'],
+                         db     =config['database']['database'])
     
     # you must create a Cursor object. It will let
     # you execute all the queries you need
