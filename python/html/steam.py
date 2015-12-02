@@ -51,5 +51,5 @@ def get_profile(steam_id_64):
         return ""
 
     # lots of stuff can be found in this!
-    profile_link = profile_json['response']['players'][0]['profileurl']
+    profile_link = profile_json['response']['players'][0]
     return profile_link
