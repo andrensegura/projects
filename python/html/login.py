@@ -88,8 +88,11 @@ def main():
                         % (up_email, username) )
             if up_steam:
                 up_steam = steam.get_profile(up_steam)
+                if up_steam['avatarmedium']:
+                    mysql.execute_mysql("UPDATE users SET avatar = '%s' WHERE username = '%s';"
+                            % (up_steam['avatarmedium'], username) )
                 mysql.execute_mysql("UPDATE users SET steam_profile = '%s' WHERE username = '%s';"
-                        % (up_steam, username) )
+                        % (up_steam['profileurl'], username) )
             print "Location: http://keycellar.drago.ninja/u/%s\n" % (username)
             
         else:
