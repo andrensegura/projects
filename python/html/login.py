@@ -6,6 +6,7 @@ import Cookie, mycookie, datetime
 import random
 import cgitb; cgitb.enable() #for troubleshooting
 from passlib.hash import pbkdf2_sha256
+from dbstructure import USERNAME, PASSWORD 
 
 #PRINTS OUT A FILE
 def print_html_file(file_name):
@@ -19,7 +20,7 @@ def login(user, passw):
     result = mysql.execute_mysql("SELECT * FROM users WHERE username = '%s'" % (user))
     if not result:
         return False
-    return pbkdf2_sha256.verify(passw, result[0][1])
+    return pbkdf2_sha256.verify(passw, result[0][PASSWORD])
 
 def create_session(user, passw):
     expires = datetime.datetime.now() + datetime.timedelta(days=3) 
@@ -68,7 +69,7 @@ def main():
     if session:
         result = mysql.execute_mysql("SELECT * FROM users WHERE logged_in = '%s'"
                    % (session["session"].value))
-        username = result[0][0] if result else username
+        username = result[0][USERNAME] if result else username
 
     #DO STUFF WITH VARS
     #PRINT STUFF TO GET VARS

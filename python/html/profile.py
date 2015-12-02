@@ -4,6 +4,7 @@ import mysql, steam
 import Cookie, os
 import cgi
 import cgitb; cgitb.enable() #for troubleshooting
+from dbstructure import USERNAME, EMAIL, TRADES, STEAM_PROFILE, LOGGED_IN, VERIFIED
 
 #PRINTS OUT A FILE
 def print_html_file(file_name):
@@ -18,7 +19,7 @@ def check_user(user):
     return result[0]
 
 def owns_profile(u_info, key):
-    if key == u_info[7]:
+    if key == u_info[LOGGED_IN]:
         return True
     else:
         return False 
@@ -35,11 +36,11 @@ def print_profile(user, info):
 <tr><td>Trades:</td><td>%s</td></tr>
 <tr><td>Steam Profile:</td><td>%s</td></tr>
 </table>
-""" % (info[0], info[2], "verified" if info[6] == 0 else "not verified", 
-       info[5], info[4] )
+""" % (info[USERNAME], info[EMAIL], "verified" if info[VERIFIED] == "0" else "not verified", 
+       info[TRADES], info[STEAM_PROFILE] )
 
     print "<br><b>Games Available for Trade:</b><br>"
-    games_list = steam.get_inventory(info[4])
+    games_list = steam.get_inventory(info[STEAM_PROFILE])
     if games_list:
         for game in games_list:
             print """<li><a href="%s">%s</a><br>""" % (game[1], game[0])

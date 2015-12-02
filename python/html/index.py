@@ -5,6 +5,7 @@ import mycookie #i wrote this
 import cgi
 import cgitb; cgitb.enable() #for troubleshooting
 from passlib.hash import pbkdf2_sha256
+from dbstructure import USERNAME
 
 #PRINTS OUT A FILE
 def print_html_file(file_name):
@@ -37,7 +38,7 @@ session = mycookie.get_cookie()
 if session:
     result = mysql.execute_mysql("SELECT * FROM users WHERE logged_in = '%s'"
                % (session["session"].value))
-    username = result[0][0] if result else username
+    username = result[0][USERNAME] if result else username
 
 print_header()
 print "<hr>"
