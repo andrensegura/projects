@@ -4,7 +4,7 @@ import mysql, steam
 import Cookie, os
 import cgi
 import cgitb; cgitb.enable() #for troubleshooting
-from dbstructure import USERNAME, EMAIL, TRADES, STEAM_PROFILE, LOGGED_IN, VERIFIED
+from dbstructure import USERNAME, EMAIL, TRADES, STEAM_PROFILE, LOGGED_IN, VERIFIED, AVATAR
 
 #PRINTS OUT A FILE
 def print_html_file(file_name):
@@ -24,11 +24,10 @@ def owns_profile(u_info, key):
     else:
         return False 
 
-#PRINT LOGIN FORM
 def print_profile(user, info):
     print "Content-type: text/html\n"
     print_html_file("header.html")
-    print_html_file("profile.html")
+    print """<h1>Profile <img src="%s" height="64" width"64"></h1>""" % (user_info[AVATAR])
     print """
 <table>
 <tr><td>Username:</td><td>%s</td></tr>
