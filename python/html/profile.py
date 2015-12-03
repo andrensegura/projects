@@ -4,7 +4,8 @@ import mysql, steam
 import Cookie, os
 import cgi
 import cgitb; cgitb.enable() #for troubleshooting
-from dbstructure import USERNAME, EMAIL, TRADES, STEAM_PROFILE, LOGGED_IN, VERIFIED, AVATAR
+from config import USERNAME, EMAIL, TRADES, STEAM_PROFILE, LOGGED_IN, VERIFIED, AVATAR
+from subprocess import Popen, PIPE, STDOUT
 
 #PRINTS OUT A FILE
 def print_html_file(file_name):
@@ -29,14 +30,14 @@ def print_profile(user, info):
     print_html_file("header.html")
     print """<h1>Profile <img src="%s" height="64" width"64"></h1>""" % (user_info[AVATAR])
     print """
-<table>
-<tr><td>Username:</td><td>%s</td></tr>
-<tr><td>Email:</td><td>%s (%s)</td></tr>
-<tr><td>Trades:</td><td>%s</td></tr>
-<tr><td>Steam Profile:</td><td>%s</td></tr>
-</table>
-""" % (info[USERNAME], info[EMAIL], "verified" if info[VERIFIED] == "0" else "not verified", 
-       info[TRADES], info[STEAM_PROFILE] )
+        <table>
+        <tr><td>Username:</td><td>%s</td></tr>
+        <tr><td>Email:</td><td>%s%s</td></tr>
+        <tr><td>Trades:</td><td>%s</td></tr>
+        <tr><td>Steam Profile:</td><td>%s</td></tr>
+        </table>
+        """ % (info[USERNAME], info[EMAIL], "" if info[VERIFIED] == "0" else " (not verified)", 
+               info[TRADES], info[STEAM_PROFILE] )
 
     print "<br><b>Games Available for Trade:</b><br>"
     games_list = steam.get_inventory(info[STEAM_PROFILE])
@@ -45,6 +46,25 @@ def print_profile(user, info):
             print """<li><a href="%s">%s</a><br>""" % (game[1], game[0])
     else:
         print "No games in inventory or inventory is private."
+
+def print_update_options():
+    code =  """<br>
+             <h2>Update your profile:</h2>
+             <form method="post" action="http://keycellar.drago.ninja/login?action=update">
+             <input type="hidden" name="username" value="%s">
+
+             <table>
+             <tr><td>Email:</td><td><input type="text" name="up_email"></td></tr>
+             <tr><td>Enter current password:</td><td><input type="password" name="password"></td></tr>
+             </table>
+             <input type="submit" value="Update Settings">
+             </form>
+             <br>
+         """ % (username)
+    print code
+
+    print """<a href="/steam.php">Add tradeable games to library via Steam.</a>"""
+
 
 #GET VARIABLES
 form = cgi.FieldStorage()
@@ -59,6 +79,7 @@ try:
     result = mysql.execute_mysql(
                "SELECT * FROM users WHERE logged_in = '%s'"
                % (session["session"].value))
+    username = result[0][USERNAME] if username == "me" else username
 except ((Cookie.CookieError, KeyError)):
     session = ""
 
@@ -73,11 +94,6 @@ elif not session:
     print_profile(username, user_info)
 elif owns_profile(user_info, session["session"].value):
     print_profile(username, user_info)
-    print """<br>
-             <h2>Update your settings:</h2>
-             <form method="post" action="http://keycellar.drago.ninja/login?action=update">"""
-    print """<input type="hidden" name="username" value="%s">""" % (username)
-    print_html_file("updatesettings.html")
-    print "</form>"
+    print_update_options()
 else:
     print_profile(username, user_info)

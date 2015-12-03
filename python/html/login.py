@@ -1,12 +1,12 @@
 #!/usr/bin/python
 
 import mysql, steam #files i wrote
-import cgi, os, string
+import cgi, os, string, re
 import Cookie, mycookie, datetime
 import random
 import cgitb; cgitb.enable() #for troubleshooting
 from passlib.hash import pbkdf2_sha256
-from dbstructure import USERNAME, PASSWORD 
+from config import USERNAME, PASSWORD 
 
 #PRINTS OUT A FILE
 def print_html_file(file_name):
@@ -76,17 +76,17 @@ def main():
     if action == "logout" and session:
         mysql.execute_mysql("UPDATE users SET logged_in = '0' WHERE logged_in = '%s';"
                             % (session["session"].value))
-        session["session"] = ""
+        session["session"] = ''
         print session
         print_lo()
     elif action == "update" and session:
         if login(username,password):
             up_email = form.getvalue("up_email", "")
             up_steam = form.getvalue("up_steam", "")
-            if up_email:
+            if re.match(r"[^@]+@[^@]+\.[^@]+", up_email):
                 mysql.execute_mysql("UPDATE users SET email = '%s' WHERE username = '%s';"
                         % (up_email, username) )
-            if up_steam:
+            if re.match(r"^[0-9]{17}$", up_steam):
                 up_steam = steam.get_profile(up_steam)
                 if up_steam['avatarmedium']:
                     mysql.execute_mysql("UPDATE users SET avatar = '%s' WHERE username = '%s';"

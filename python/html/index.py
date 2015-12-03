@@ -5,7 +5,7 @@ import mycookie #i wrote this
 import cgi
 import cgitb; cgitb.enable() #for troubleshooting
 from passlib.hash import pbkdf2_sha256
-from dbstructure import USERNAME
+from config import USERNAME
 
 #PRINTS OUT A FILE
 def print_html_file(file_name):
