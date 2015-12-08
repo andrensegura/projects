@@ -1,16 +1,12 @@
 #!/usr/bin/python
 
 import mysql, steam
+from functions import print_header, print_html_file
 import Cookie, os
 import cgi
 import cgitb; cgitb.enable() #for troubleshooting
 from config import USERNAME, EMAIL, TRADES, STEAM_PROFILE, LOGGED_IN, VERIFIED, AVATAR, GAMES
 from subprocess import Popen, PIPE, STDOUT
-
-#PRINTS OUT A FILE
-def print_html_file(file_name):
-    with open(file_name, 'r') as fin:
-        print fin.read()
 
 #CHECK USER
 def check_user(user):
@@ -26,8 +22,6 @@ def owns_profile(u_info, key):
         return False 
 
 def print_profile(info):
-    print "Content-type: text/html\n"
-    print_html_file("header.html")
     print """<h1><img src="%s" alt=""> %s</h1>""" % (user_info[AVATAR], user_info[USERNAME])
     print """
         <table>
@@ -87,9 +81,8 @@ except ((Cookie.CookieError, KeyError)):
 #DO STUFF WITH VARS
 #PRINT STUFF TO GET VARS
 user_info = check_user(username)
+print_header()
 if user_info == "No such user here.":
-    print "Content-type: text/html\n"
-    print_html_file("header.html")
     print user_info #which is just "No such user here."
 elif not session:
     print_profile(user_info)

@@ -1,6 +1,5 @@
-import Cookie, os
-
 def get_cookie():
+    import Cookie, os
     session = Cookie.SimpleCookie()
     try:
         session.load(os.environ["HTTP_COOKIE"])

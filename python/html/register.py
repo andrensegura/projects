@@ -2,6 +2,7 @@
 
 import mysql  #file i wrote
 import kcmail #file i wrote
+from functions import print_header
 import re, string
 import random
 import cgi
@@ -37,17 +38,11 @@ def register_user(user, email, passw, passw2):
 
 #PRINT REGISTRATION FORM
 def print_registration_form():
-    print "Content-type: text/html\n"
-    print_html_file("header.html")
     print_html_file("register.html")
 
 def print_registration_success():
-    print "Content-type: text/html\n"
-    print_html_file("header.html")
     print_html_file("success.html")
 def print_verification_success():
-    print "Content-type: text/html\n"
-    print_html_file("header.html")
     print_html_file("verified.html")
 
 #GET VARIABLES
@@ -61,6 +56,8 @@ verify = form.getvalue("verify", "")
 #DO STUFF WITH VARS
 #PRINT STUFF TO GET VARS
 r_result = register_user(username, email, password, password2)
+
+print_header()
 
 if verify:
     mysql.execute_mysql("""UPDATE users SET verified = '0' WHERE verified = %s;""" , (verify,))

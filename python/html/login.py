@@ -2,11 +2,12 @@
 
 import mysql, steam #files i wrote
 import cgi, os, string, re
-import Cookie, mycookie, datetime
+import Cookie, datetime
 import random
 import cgitb; cgitb.enable() #for troubleshooting
 from passlib.hash import pbkdf2_sha256
 from config import USERNAME, PASSWORD 
+from functions import get_cookie, print_html_file, print_header
 
 #PRINTS OUT A FILE
 def print_html_file(file_name):
@@ -38,23 +39,19 @@ def create_session(user, passw):
 
 #PRINT LOGIN FORM
 def print_login_form(user, passw):
-    print "Content-type: text/html\n"
-    print_html_file("header.html")
+    print_header()
     print_html_file("login.html")
     if user or passw:
         print "Invalid username or password."
 def print_login_success(user):
-    print "Content-type: text/html\n"
-    print_html_file("header.html")
+    print_header()
     print_html_file("success.html")
     print """Proceed to your <a href="profile.cgi?user=%s">profile.</a>""" % (user)
 def print_logout(user):
-    print "Content-type: text/html\n"
-    print_html_file("header.html")
-    print """<a href="login?action=logout">Logout(%s)</a>""" % (user)
+    print_header()
+    print """Already logged in as %s!</a>""" % (user)
 def print_lo():
-    print "Content-type: text/html\n"
-    print_html_file("header.html")
+    print_header()
     print_html_file("logout.html")
 
 def main():
@@ -65,7 +62,7 @@ def main():
     action = form.getvalue("action", "")
 
     #CHECK COOKIE
-    session = mycookie.get_cookie()
+    session = get_cookie()
     if session:
         result = mysql.execute_mysql("""SELECT * FROM users WHERE logged_in = %s"""
                    , (session["session"].value,))
@@ -116,8 +113,7 @@ def main():
             
         else:
             #change to redirect back to profile
-            print "Content-type: text/html\n"
-            print_html_file("header.html")
+            print_header()
             print "Invalid password!"
     elif not session or not session["session"].value:
         if login(username, password):
