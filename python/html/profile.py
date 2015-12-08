@@ -4,7 +4,7 @@ import mysql, steam
 import Cookie, os
 import cgi
 import cgitb; cgitb.enable() #for troubleshooting
-from config import USERNAME, EMAIL, TRADES, STEAM_PROFILE, LOGGED_IN, VERIFIED, AVATAR
+from config import USERNAME, EMAIL, TRADES, STEAM_PROFILE, LOGGED_IN, VERIFIED, AVATAR, GAMES
 from subprocess import Popen, PIPE, STDOUT
 
 #PRINTS OUT A FILE
@@ -40,8 +40,10 @@ def print_profile(user, info):
                info[TRADES], info[STEAM_PROFILE] )
 
     print "<br><b>Games Available for Trade:</b><br>"
-    games_list = steam.get_inventory(info[STEAM_PROFILE])
+    games_list = info[GAMES] 
     if games_list:
+        from ast import literal_eval
+        games_list = literal_eval(games_list)
         for game in games_list:
             print """<li><a href="%s">%s</a><br>""" % (game[1], game[0])
     else:
