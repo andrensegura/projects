@@ -25,7 +25,7 @@ def print_nav():
     print """<span style="float:right" >"""
     print """<input type="image" style="height:20px;width:20px;vertical-align:middle"
              src="/pics/search.png" />"""
-    print """<input type="text">"""
+    print """<input type="text" placeholder="Search">"""
     print """&nbsp;</span>"""
     print "<hr>"
 
