@@ -90,4 +90,4 @@ elif owns_profile(user_info, session["session"].value):
     print_profile(user_info)
     print_update_options()
 else:
-    print_profile(username, user_info)
+    print_profile(user_info)
