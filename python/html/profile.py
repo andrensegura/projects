@@ -25,18 +25,17 @@ def owns_profile(u_info, key):
     else:
         return False 
 
-def print_profile(user, info):
+def print_profile(info):
     print "Content-type: text/html\n"
     print_html_file("header.html")
-    print """<h1>Profile <img src="%s" height="64" width"64"></h1>""" % (user_info[AVATAR])
+    print """<h1><img src="%s" alt=""> %s</h1>""" % (user_info[AVATAR], user_info[USERNAME])
     print """
         <table>
-        <tr><td>Username:</td><td>%s</td></tr>
         <tr><td>Email:</td><td>%s%s</td></tr>
         <tr><td>Trades:</td><td>%s</td></tr>
         <tr><td>Steam Profile:</td><td>%s</td></tr>
         </table>
-        """ % (info[USERNAME], info[EMAIL], "" if info[VERIFIED] == "0" else " (not verified)", 
+        """ % (info[EMAIL], "" if info[VERIFIED] == "0" else " (not verified)", 
                info[TRADES], info[STEAM_PROFILE] )
 
     print "<br><b>Games Available for Trade:</b><br>"
@@ -93,9 +92,9 @@ if user_info == "No such user here.":
     print_html_file("header.html")
     print user_info #which is just "No such user here."
 elif not session:
-    print_profile(username, user_info)
+    print_profile(user_info)
 elif owns_profile(user_info, session["session"].value):
-    print_profile(username, user_info)
+    print_profile(user_info)
     print_update_options()
 else:
     print_profile(username, user_info)
