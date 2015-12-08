@@ -14,6 +14,7 @@ if(!isset($_SESSION['steamid'])) {
 
     echo "Login to Steam to auto-add tradeable games to your collection:";
     echo steamlogin(); //login button
+    echo "<i><a href=\"http://store.steampowered.com/\">Proudly powered by Steam!</a></i>";
     
 }  else {
     include ('steamauth/userInfo.php');
@@ -27,6 +28,7 @@ if(!isset($_SESSION['steamid'])) {
     echo "</form>";
  
     logoutbutton();
+    echo "<i><a href=\"http://store.steampowered.com/\">Proudly powered by Steam!</a></i>";
 }    
 ?>  
 </body>
