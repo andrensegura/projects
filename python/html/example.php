@@ -1,5 +1,7 @@
 <?php
     require ('steamauth/steamauth.php');  
+    include 'header.html';
+    echo "<hr><a href=\"/\">Home</a><hr>";
     
 	# You would uncomment the line beneath to make it refresh the data every time the page is loaded
 	// $_SESSION['steam_uptodate'] = false;
@@ -22,7 +24,7 @@ if(!isset($_SESSION['steamid'])) {
     //Protected content
     echo "<form method=\"post\" action=\"login?action=update\">"; 
     echo "<input type=\"hidden\" name=\"up_steam\" value=\"".$steamprofile['steamid']."\">";
-    echo "Successfully logged in! Please click below to update your list.<br>";
+    echo "Successfully logged into Steam! Please click below to update your list.<br>";
     echo "Enter current password: <input type=\"password\" name=\"password\"><br>";
     echo "<input type=\"submit\" value=\"Update\">";
     echo "</form>";
