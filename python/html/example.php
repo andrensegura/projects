@@ -12,7 +12,7 @@
 <?php
 if(!isset($_SESSION['steamid'])) {
 
-    echo "welcome guest! please login \n \n";
+    echo "Login to Steam to auto-add tradeable games to your collection:";
     echo steamlogin(); //login button
     
 }  else {

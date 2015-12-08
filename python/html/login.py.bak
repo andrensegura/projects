@@ -33,7 +33,7 @@ def register_user(user, email, passw, passw2):
 #PRINT LOGIN FORM
 def print_login_form():
     print "Content-type: text/html\n"
-    print_html_file("/home/andre/domains/drago.ninja/header.html")
+    print_html_file("header.html")
     print_html_file("login.html")
     if username or password:
         print "Invalid username or password."
@@ -41,7 +41,7 @@ def print_login_form():
 #PRINT REGISTRATION FORM
 def print_registration_form():
     print "Content-type: text/html\n"
-    print_html_file("/home/andre/domains/drago.ninja/header.html")
+    print_html_file("header.html")
     print_html_file("register.html")
 
 #GET VARIABLES

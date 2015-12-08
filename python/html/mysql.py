@@ -2,7 +2,7 @@
 import MySQLdb
 import toml
 
-def execute_mysql(query):
+def execute_mysql(query, args_tup):
     with open("db.toml") as toml_file:
         config = toml.loads(toml_file.read())
     db = MySQLdb.connect(host   ="localhost",
@@ -15,7 +15,7 @@ def execute_mysql(query):
     cur = db.cursor() 
     
     # Use all the SQL you like
-    cur.execute(query)
+    cur.execute(query, args_tup)
     
     #return the results
     return cur.fetchall()

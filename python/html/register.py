@@ -17,10 +17,10 @@ def print_html_file(file_name):
 def register_user(user, email, passw, passw2):
     if not (user or email or passw or passw2):
         return "nothing"
-    result = mysql.execute_mysql("SELECT * FROM users WHERE username = '%s'" % (user))
+    result = mysql.execute_mysql("""SELECT * FROM users WHERE username = %s""" , (user,))
     if not user or result: #no username give, or username exists
         return "user"
-    result = mysql.execute_mysql("SELECT * FROM users WHERE email = '%s'" % (email))
+    result = mysql.execute_mysql("""SELECT * FROM users WHERE email = %s""" , (email,))
     if not re.match(r"[^@]+@[^@]+\.[^@]+", email) or result:
         return "email"
     if not passw or (passw != passw2) or (len(passw) < 8):
@@ -30,8 +30,8 @@ def register_user(user, email, passw, passw2):
     random.seed(passw)
     key = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(16))
     mysql.execute_mysql( """INSERT INTO users (username, password, email, verified)
-                          VALUES ('%s', '%s', '%s', '%s');"""
-                          % (user, pw_hash, email, key) )
+                          VALUES (%s, %s, %s, %s);"""
+                          , (user, pw_hash, email, key,) )
     kcmail.email_new_account(email, user, "http://keycellar.drago.ninja/register.cgi?verify=%s" % (key))
     return "ok"
 
@@ -41,6 +41,10 @@ def print_registration_form():
     print_html_file("header.html")
     print_html_file("register.html")
 
+def print_registration_success():
+    print "Content-type: text/html\n"
+    print_html_file("header.html")
+    print_html_file("success.html")
 def print_verification_success():
     print "Content-type: text/html\n"
     print_html_file("header.html")
@@ -59,10 +63,10 @@ verify = form.getvalue("verify", "")
 r_result = register_user(username, email, password, password2)
 
 if verify:
-    mysql.execute_mysql("UPDATE users SET verified = '0' WHERE verified = '%s';" % (verify))
+    mysql.execute_mysql("""UPDATE users SET verified = '0' WHERE verified = %s;""" , (verify,))
     print_verification_success()
 if r_result == "ok":
-    print "Location: http://keycellar.drago.ninja/u/faroeson"
+    print_registration_success()
 
 if not verify:
     print_registration_form()

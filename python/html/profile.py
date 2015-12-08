@@ -14,7 +14,7 @@ def print_html_file(file_name):
 
 #CHECK USER
 def check_user(user):
-    result = mysql.execute_mysql("SELECT * FROM users WHERE username = '%s'" % (user))
+    result = mysql.execute_mysql("""SELECT * FROM users WHERE username = %s""" , (user,))
     if not result or not user:
         return "No such user here."
     return result[0]
@@ -77,8 +77,8 @@ session = Cookie.SimpleCookie()
 try:
     session.load(os.environ["HTTP_COOKIE"])
     result = mysql.execute_mysql(
-               "SELECT * FROM users WHERE logged_in = '%s'"
-               % (session["session"].value))
+               """SELECT * FROM users WHERE logged_in = %s"""
+               , (session["session"].value,))
     username = result[0][USERNAME] if username == "me" else username
 except ((Cookie.CookieError, KeyError)):
     session = ""

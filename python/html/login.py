@@ -17,7 +17,7 @@ def print_html_file(file_name):
 def login(user, passw):
     if not (user and passw):
         return False
-    result = mysql.execute_mysql("SELECT * FROM users WHERE username = '%s'" % (user))
+    result = mysql.execute_mysql("""SELECT * FROM users WHERE username = %s""" , (user,))
     if not result:
         return False
     return pbkdf2_sha256.verify(passw, result[0][PASSWORD])
@@ -32,8 +32,8 @@ def create_session(user, passw):
     cookie["session"]["path"] = "/"
     cookie["session"]["expires"] = expires.strftime("%a, %d-%b-%Y %H:%M:%S PST")
     #set key in database
-    mysql.execute_mysql("UPDATE users SET logged_in = '%s' WHERE username = '%s';"
-                        % (key, user) )
+    mysql.execute_mysql("""UPDATE users SET logged_in = %s WHERE username = %s;"""
+                        , (key, user,) )
     return cookie
 
 #PRINT LOGIN FORM
@@ -67,16 +67,16 @@ def main():
     #CHECK COOKIE
     session = mycookie.get_cookie()
     if session:
-        result = mysql.execute_mysql("SELECT * FROM users WHERE logged_in = '%s'"
-                   % (session["session"].value))
+        result = mysql.execute_mysql("""SELECT * FROM users WHERE logged_in = %s"""
+                   , (session["session"].value,))
         username = result[0][USERNAME] if result else username
 
     #DO STUFF WITH VARS
     #PRINT STUFF TO GET VARS
     if action == "logout" and session:
-        mysql.execute_mysql("UPDATE users SET logged_in = '0' WHERE logged_in = '%s';"
-                            % (session["session"].value))
-        session["session"] = ''
+        mysql.execute_mysql("""UPDATE users SET logged_in = '0' WHERE logged_in = %s;"""
+                            , (session["session"].value,))
+        session["session"] = ""
         print session
         print_lo()
     elif action == "update" and session:
@@ -84,15 +84,26 @@ def main():
             up_email = form.getvalue("up_email", "")
             up_steam = form.getvalue("up_steam", "")
             if re.match(r"[^@]+@[^@]+\.[^@]+", up_email):
-                mysql.execute_mysql("UPDATE users SET email = '%s' WHERE username = '%s';"
-                        % (up_email, username) )
+                mysql.execute_mysql("""UPDATE users SET email = %s WHERE username = %s;"""
+                        , (up_email, username,) )
             if re.match(r"^[0-9]{17}$", up_steam):
                 up_steam = steam.get_profile(up_steam)
+                #set avatar
                 if up_steam['avatarmedium']:
-                    mysql.execute_mysql("UPDATE users SET avatar = '%s' WHERE username = '%s';"
-                            % (up_steam['avatarmedium'], username) )
-                mysql.execute_mysql("UPDATE users SET steam_profile = '%s' WHERE username = '%s';"
-                        % (up_steam['profileurl'], username) )
+                    mysql.execute_mysql("""UPDATE users SET avatar = %s WHERE username = %s;"""
+                            , (up_steam['avatarmedium'], username,) )
+                #get tradeablegames and catalog them
+                games_list = steam.get_inventory(up_steam)
+                if games_list:
+                   result =  mysql.execute_mysql("""SELECT username, CONCAT(games, %s) games FROM users
+                                       WHERE username = %s;"""
+                                       , (games_list, username) )
+                    games_list = result[0][1]
+                    mysql.execute_mysql("""UPDATE users SET games = %s WHERE username = %s;""",
+                                        (games_list, username) )
+                #set profile link
+                mysql.execute_mysql("""UPDATE users SET steam_profile = %s WHERE username = %s;"""
+                        , (up_steam['profileurl'], username,) )
             print "Location: http://keycellar.drago.ninja/u/%s\n" % (username)
             
         else:

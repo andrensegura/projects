@@ -1,9 +1,8 @@
 #!/usr/bin/python
 import pycurl, json
 from StringIO import StringIO
+from config import STEAM_KEY
 
-
-STEAM_KEY = "F5A08C50EEFCE8675A2DD909C6F05EEB"
 
 def get_steam_json(url):
     buffer = StringIO()

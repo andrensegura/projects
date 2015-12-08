@@ -1,0 +1,9 @@
+[users]
+username=0
+password=1
+email=2
+games=3
+steam_profile=4
+trades=5
+verified=6
+logged_in=7

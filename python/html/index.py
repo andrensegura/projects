@@ -36,8 +36,8 @@ username = ""
 session = mycookie.get_cookie()
 
 if session:
-    result = mysql.execute_mysql("SELECT * FROM users WHERE logged_in = '%s'"
-               % (session["session"].value))
+    result = mysql.execute_mysql("""SELECT * FROM users WHERE logged_in = %s"""
+               , (session["session"].value,))
     username = result[0][USERNAME] if result else username
 
 print_header()

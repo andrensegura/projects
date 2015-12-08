@@ -1,6 +1,7 @@
-#!/usr/bin/python
+from dbstructure import LOGGED_IN
+import toml
+with open("db.toml") as toml_file:
+    config = toml.loads(toml_file.read())['database']['username']
 
-def say_hello(hello, world):
-    print "%s, %s" % (hello, world)
-
-say_hello("what up", "dawg")
+print config
+print LOGGED_IN
