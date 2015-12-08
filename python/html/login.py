@@ -88,22 +88,30 @@ def main():
                         , (up_email, username,) )
             if re.match(r"^[0-9]{17}$", up_steam):
                 up_steam = steam.get_profile(up_steam)
+                #set profile link
+                mysql.execute_mysql("""UPDATE users SET steam_profile = %s WHERE username = %s;"""
+                        , (up_steam['profileurl'], username,) )
                 #set avatar
                 if up_steam['avatarmedium']:
                     mysql.execute_mysql("""UPDATE users SET avatar = %s WHERE username = %s;"""
                             , (up_steam['avatarmedium'], username,) )
-                #get tradeablegames and catalog them
-                games_list = steam.get_inventory(up_steam)
+                #get tradeable games and catalog them
+                games_list = steam.get_inventory(str(up_steam['profileurl'])) #doesn't work with unicode
                 if games_list:
-                   result =  mysql.execute_mysql("""SELECT username, CONCAT(games, %s) games FROM users
-                                       WHERE username = %s;"""
-                                       , (games_list, username) )
-                    games_list = result[0][1]
+                    #result =  mysql.execute_mysql("""SELECT username, CONCAT(games, %s) games FROM users
+                    #                   WHERE username = %s;"""
+                    #                   , (games_list, username) )
+                    try:
+                        result = mysql.execute_mysql("""SELECT games FROM users WHERE username = %s;"""
+                                                , (username,) )
+                        from ast import literal_eval
+                        result = literal_eval(result[0][1])
+                        games_list.append(result)
+                    except:
+                        pass
+                    games_list.sort()
                     mysql.execute_mysql("""UPDATE users SET games = %s WHERE username = %s;""",
-                                        (games_list, username) )
-                #set profile link
-                mysql.execute_mysql("""UPDATE users SET steam_profile = %s WHERE username = %s;"""
-                        , (up_steam['profileurl'], username,) )
+                                    (str(games_list), username) )
             print "Location: http://keycellar.drago.ninja/u/%s\n" % (username)
             
         else:
