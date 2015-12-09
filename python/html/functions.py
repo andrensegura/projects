@@ -10,7 +10,22 @@ def print_header():
 
 def print_nav():
     user = get_session_user()
+
+    #mailbox
+    if user:
+        print """<form method="post" action="/mail" display="inline" style="margin:0px;padding:0px;">
+                 <div align="right">"""
+        print """<input type="image" style="height:20px;width:20px;justify:right"
+                 src="/pics/mailbox.png" />&nbsp;&nbsp;&nbsp;"""
+        print """</div></form>"""
+    else:
+        print "<br><br>"
+        pass
+
+    
     print "<hr>"
+
+    print """<form method="post" action="/search" display="inline" style="margin:0px;padding:0px;">"""
     print """<a href="/">Home</a>"""
     print "&nbsp;|&nbsp;"
     if user:
@@ -25,8 +40,10 @@ def print_nav():
     print """<span style="float:right" >"""
     print """<input type="image" style="height:20px;width:20px;vertical-align:middle"
              src="/pics/search.png" />"""
-    print """<input type="text" placeholder="Search">"""
+    print """<input type="text" name="search" placeholder="Search" accesskey="s" title="try Alt+s!">"""
     print """&nbsp;</span>"""
+    print """</form>"""
+
     print "<hr>"
 
 def get_session_user():
