@@ -13,7 +13,7 @@ def print_nav():
 
     #mailbox
     if user:
-        print """<form method="post" action="/mail" display="inline" style="margin:0px;padding:0px;">
+        print """<form method="post" action="/inbox" display="inline" style="margin:0px;padding:0px;">
                  <div align="right">"""
         print """<input type="image" style="height:20px;width:20px;justify:right"
                  src="/pics/mailbox.png" />&nbsp;&nbsp;&nbsp;"""
