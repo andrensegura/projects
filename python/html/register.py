@@ -2,17 +2,12 @@
 
 import mysql  #file i wrote
 import kcmail #file i wrote
-from functions import print_header
+from functions import print_header, print_html_file
 import re, string
 import random
 import cgi
 import cgitb; cgitb.enable() #for troubleshooting
 from passlib.hash import pbkdf2_sha256
-
-#PRINTS OUT A FILE
-def print_html_file(file_name):
-    with open(file_name, 'r') as fin:
-        print fin.read()
 
 #CHECKS REGISTRATION INPUT CRED, RETURNS ok ON SUCCESS
 def register_user(user, email, passw, passw2):

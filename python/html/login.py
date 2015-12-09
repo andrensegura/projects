@@ -9,11 +9,6 @@ from passlib.hash import pbkdf2_sha256
 from config import USERNAME, PASSWORD 
 from functions import get_cookie, print_html_file, print_header
 
-#PRINTS OUT A FILE
-def print_html_file(file_name):
-    with open(file_name, 'r') as fin:
-        print fin.read()
-
 #CHECKS LOG IN CRED, RETURNS TRUE ON SUCCESS
 def login(user, passw):
     if not (user and passw):
