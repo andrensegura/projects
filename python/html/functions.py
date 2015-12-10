@@ -13,11 +13,9 @@ def print_nav():
 
     #mailbox
     if user:
-        print """<form method="post" action="/inbox" display="inline" style="margin:0px;padding:0px;">
-                 <div align="right">"""
-        print """<input type="image" style="height:20px;width:20px;justify:right"
-                 src="/pics/mailbox.png" />&nbsp;&nbsp;&nbsp;"""
-        print """</div></form>"""
+        print """<div align="right"><a href="/inbox">
+                 <img src="/pics/mailbox.png" alt="inbox" style="width:20px;height:20px;">
+                 </a></div>"""
     else:
         print "<br><br>"
         pass
