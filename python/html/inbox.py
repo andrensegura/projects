@@ -2,6 +2,7 @@
 
 import cgi
 import mysql
+from config import IS_READ, SENDER, RECIPIENT, SUBJECT, BODY
 from functions import print_header, get_session_user
 
 username = get_session_user()
@@ -12,17 +13,16 @@ print_header()
 
 if mail:
     for message in mail:
-#        print """<table style="white-space:pre-wrap;">
-#            <tr><td>From: %s</td></tr>
-#            <tr><td>To: %s</td></tr>
-#            <tr><td>Message:</td></tr>
-#            <tr><td>%s</td></tr>
-#            </table>""" % (message[1], message[2], message[4])
-        print """<table style="white-space:pre-wrap;">
-            <tr><td>From:</td><td>%s</td></tr>
-            <tr><td>To:</td><td>%s</td></tr>
-            <tr><td>Message:</td><td>%s</td></tr>
-            </table>""" % (message[1], message[2], message[4])
+        if message[IS_READ]:
+            print """<table style="white-space:pre-wrap;">"""
+        else:
+            print """<table style="white-space:pre-wrap;" bgcolor="#f2f2f2" width="100%">"""
+        print """ 
+            <tr><td>From:</td><td valign="left">%s</td></tr>
+            <tr><td>To:</td><td valign="left">%s</td></tr>
+            <tr><td valign="top">Subject:</td><td valign="left">%s</td></tr>
+            <tr><td valign="top">Message:</td><td valign="left">%s</td></tr>
+            </table>""" % (message[SENDER], message[RECIPIENT], message[SUBJECT], message[BODY])
         print "<br><hr><br>"
 else:
     print "No mail! :("
