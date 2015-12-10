@@ -13,7 +13,7 @@ print_header()
 
 if mail:
     for message in mail:
-        if message[IS_READ]:
+        if message[IS_READ] or message[SENDER] == username:
             print """<table style="white-space:pre-wrap;">"""
         else:
             print """<table style="white-space:pre-wrap;" bgcolor="#f2f2f2">"""
