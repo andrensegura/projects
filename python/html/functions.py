@@ -13,9 +13,18 @@ def print_nav():
 
     #mailbox
     if user:
-        print """<div align="right"><a href="/inbox">
-                 <img src="/pics/mailbox.png" alt="inbox" style="width:20px;height:20px;">
-                 </a></div>"""
+        import mysql
+        result = mysql.execute_mysql("""SELECT * FROM mail WHERE recipient = %s AND is_read = '0';"""
+                    , (user,) )
+        print result
+        if result: 
+            print """<div align="right"><a href="/inbox">
+                     <img src="/pics/unread.png" alt="inbox" style="width:20px;height:20px;">
+                     </a></div>"""
+        else:
+            print """<div align="right"><a href="/inbox">
+                     <img src="/pics/mailbox.png" alt="inbox" style="width:20px;height:20px;">
+                     </a></div>"""
     else:
         print "<br><br>"
         pass
