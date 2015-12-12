@@ -56,7 +56,7 @@ def print_nav():
 def is_verified(user):
     import mysql
     result = mysql.execute_mysql("""SELECT verified FROM users WHERE username = %s;""", (user,) )
-    if result == "0":
+    if result[0][0] == "0":
         return True
     else:
         return False
