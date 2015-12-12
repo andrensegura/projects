@@ -45,7 +45,7 @@ def print_profile(info):
 def print_update_options():
     code =  """<br>
              <h2>Update your profile:</h2>
-             <form method="post" action="http://keycellar.drago.ninja/login?action=update">
+             <form method="post" action="/login?action=update">
              <input type="hidden" name="username" value="%s">
 
              <table>
@@ -74,7 +74,8 @@ try:
     result = mysql.execute_mysql(
                """SELECT * FROM users WHERE logged_in = %s"""
                , (session["session"].value,))
-    username = result[0][USERNAME] if username == "me" else username
+    if result:
+        username = result[0][USERNAME] if username == "me" else username
 except ((Cookie.CookieError, KeyError)):
     session = ""
 

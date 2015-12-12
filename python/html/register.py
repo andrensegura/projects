@@ -28,7 +28,7 @@ def register_user(user, email, passw, passw2):
     mysql.execute_mysql( """INSERT INTO users (username, password, email, verified)
                           VALUES (%s, %s, %s, %s);"""
                           , (user, pw_hash, email, key,) )
-    kcmail.email_new_account(email, user, "http://keycellar.drago.ninja/register.cgi?verify=%s" % (key))
+    kcmail.email_new_account(email, user, "http://keycellar.com/register.cgi?verify=%s" % (key))
     return "ok"
 
 #PRINT REGISTRATION FORM

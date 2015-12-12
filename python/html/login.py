@@ -24,7 +24,7 @@ def create_session(user, passw):
     random.seed(passw)
     key = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(16)) 
     cookie["session"] = key
-    cookie["session"]["domain"] = ".keycellar.drago.ninja"
+    cookie["session"]["domain"] = "keycellar.com"
     cookie["session"]["path"] = "/"
     cookie["session"]["expires"] = expires.strftime("%a, %d-%b-%Y %H:%M:%S PST")
     #set key in database
@@ -69,7 +69,10 @@ def main():
         mysql.execute_mysql("""UPDATE users SET logged_in = '0' WHERE logged_in = %s;"""
                             , (session["session"].value,))
         session["session"] = ""
-        print session
+        session["session"]["domain"] = "keycellar.com"
+        session["session"]["path"] = "/"
+        session["session"]["expires"] = 'Thu, 01 Jan 1970 00:00:00 GMT'
+        print session.output()
         print_lo()
     elif action == "update" and session:
         if login(username,password):
@@ -104,7 +107,7 @@ def main():
                     games_list.sort()
                     mysql.execute_mysql("""UPDATE users SET games = %s WHERE username = %s;""",
                                     (str(games_list), username) )
-            print "Location: http://keycellar.drago.ninja/u/%s\n" % (username)
+            print "Location: http://keycellar.com/u/%s\n" % (username)
             
         else:
             #change to redirect back to profile
@@ -114,7 +117,7 @@ def main():
         if login(username, password):
             session = create_session(username, password)
             print session.output()
-            print "Location: http://keycellar.drago.ninja/u/%s\n" % (username)
+            print "Location: http://keycellar.com/u/%s\n" % (username)
         else:
             print_login_form(username, password)
     elif session:

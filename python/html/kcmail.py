@@ -5,7 +5,7 @@ import email.utils
 from email.mime.text import MIMEText
 
 def email_new_account(address, username, verify_link):
-    sender = "andre@drago.ninja" 
+    sender = "andre@keycellar.com" 
     receivers = [address]
 
     msg = MIMEText("""
@@ -15,7 +15,7 @@ You are receiving this message because the email address
 
 %s
 
-was used to sign up for an account on http://keycellar.drago.ninja. If
+was used to sign up for an account on http://keycellar.com. If
 you did NOT sign up for this service, please reply to this email and
 let me know. I will remove the user as soon as I am aware. Other than
 this signup notice, you will not receive any emails from this domain
