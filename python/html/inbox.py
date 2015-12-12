@@ -44,11 +44,19 @@ def print_mail(mail):
             </table>""" % (message[SENDER], message[RECIPIENT], message[TIME], message[SUBJECT], message[BODY])
         if message[RECIPIENT] == username:
             print """
-                <form method="post" display="inline" action="/inbox">
+                <form method="post" style="display:inline;margin:0px;padding:0px;" action="/inbox">
                     <input type="hidden" name="id" value="%s">
                     <input type="submit" value="Reply">
                 </form>
                 """ % (message[ID])
+            if not message[IS_READ]:
+                print """
+                    &nbsp;
+                    <form method="post" style="display:inline;margin:0px;padding:0px;" action="/inbox">
+                        <input type="hidden" name="mar" value="%s">
+                        <input type="submit" value="Mark as read">
+                    </form>
+                    """ % (message[ID])
         print "<br><hr><br>"
 
 def print_compose(user, id=0):
@@ -86,6 +94,10 @@ form = cgi.FieldStorage()
 sort_by = form.getvalue("sort", "")
 compose = form.getvalue("id", "")
 send = form.getvalue("send", "")
+mar = form.getvalue("mar", "")
+
+if mar:
+    mysql.execute_mysql("""UPDATE mail SET is_read = '1' WHERE id = %s;""", (mar,) ) 
 
 print_header()
 
