@@ -3,7 +3,7 @@
 import cgi
 import mysql
 from config import ID, IS_READ, SENDER, RECIPIENT, TIME, SUBJECT, BODY
-from functions import print_header, get_session_user
+from functions import print_header, get_session_user, is_verified
 
 
 #SORT METHODS
@@ -88,7 +88,6 @@ def print_compose(user, id=0):
         </form>
         """ % (user, user, mail[SENDER], mail[SUBJECT], mail[BODY])
 
-
 username = get_session_user()
 form = cgi.FieldStorage()
 sort_by = form.getvalue("sort", "")
@@ -100,6 +99,10 @@ if mar:
     mysql.execute_mysql("""UPDATE mail SET is_read = '1' WHERE id = %s;""", (mar,) ) 
 
 print_header()
+
+if not is_verified(username):
+    print "Mail functionality is not available to un-verified users. (  * A * )/"
+    import sys; sys.exit()
 
 print """
     <a href="/inbox?sort=unread">Unread</a> - 
