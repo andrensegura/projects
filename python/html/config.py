@@ -16,9 +16,10 @@ AVATAR        = 8
 ID        = 0
 SENDER    = 1
 RECIPIENT = 2
-IS_READ   = 3
-SUBJECT   = 4
-BODY      = 5
+TIME      = 3
+IS_READ   = 4
+SUBJECT   = 5
+BODY      = 6
 
 
 #####################
