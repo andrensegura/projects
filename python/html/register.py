@@ -37,6 +37,10 @@ def recover_password(action):
         if not rec_email or not result:
             print "Not a valid email address."
         else:
+            key = ''.join(random.SystemRandom().choice(string.ascii_uppercase +
+                    string.digits) for _ in range(16))
+            mysql.execute_mysql("""UPDATE users SET verified = %s WHERE email = %s;""" , (key, rec_email,))
+            kcmail.email_password_recovery(rec_email, "https://keycellar.com/login?reset=%s" % (key))
             print """Password recovery email sent."""
             return 0
     print """<h3>Password Recovery:</h3>
