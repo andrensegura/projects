@@ -2,7 +2,7 @@
 
 import mysql  #file i wrote
 import kcmail #file i wrote
-from functions import print_header, print_html_file
+from functions import print_header, print_html_file, create_password_hash
 import re, string
 import random
 import cgi
@@ -22,7 +22,7 @@ def register_user(user, email, passw, passw2):
     if not passw or (passw != passw2) or (len(passw) < 8):
        return "password"
 
-    pw_hash = pbkdf2_sha256.encrypt(passw, rounds=200000, salt_size=16)
+    pw_hash = create_password_hash(passw)
     random.seed(passw)
     key = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(16))
     mysql.execute_mysql( """INSERT INTO users (username, password, email, verified)
