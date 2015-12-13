@@ -83,3 +83,6 @@ def get_cookie():
     except ((Cookie.CookieError, KeyError)):
         session = ""
     return session
+
+def create_password_hash(passw):
+    return pbkdf2_sha256.encrypt(passw, rounds=200000, salt_size=16)
