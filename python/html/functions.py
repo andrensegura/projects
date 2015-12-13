@@ -85,4 +85,5 @@ def get_cookie():
     return session
 
 def create_password_hash(passw):
+    from passlib.hash import pbkdf2_sha256
     return pbkdf2_sha256.encrypt(passw, rounds=200000, salt_size=16)
