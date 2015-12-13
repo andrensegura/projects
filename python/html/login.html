@@ -1,8 +1,9 @@
-<form method="post" action="login">
+<form method="post" action="/login">
   <table>
   <tr><td>Username:</td><td><input type="text" name="username" autofocus/></td><tr>
    <tr><td>Password:</td><td><input type="password" name="password"/></td><tr>
   </table>
   <input type="submit" value="Log in">&nbsp;
-  <a href="register">Register</a>
+  <a href="/register?recover=0">Forgot password?</a> &nbsp;
+  <a href="/register">Register</a>
 </form>
