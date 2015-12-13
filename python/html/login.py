@@ -7,7 +7,7 @@ import random
 import cgitb; cgitb.enable() #for troubleshooting
 from passlib.hash import pbkdf2_sha256
 from config import USERNAME, PASSWORD 
-from functions import get_cookie, print_html_file, print_header
+from functions import get_cookie, print_html_file, print_header, create_password_hash
 
 #CHECKS LOG IN CRED, RETURNS TRUE ON SUCCESS
 def login(user, passw):
@@ -55,6 +55,32 @@ def main():
     username = form.getvalue("username", "")
     password = form.getvalue("password", "")
     action = form.getvalue("action", "")
+    reset = form.getvalue("reset", "")
+    
+    if reset:
+        import sys
+        new_password = form.getvalue("new_pass", "")
+        new_password2 = form.getvalue("new_pass2", "")
+        print_header()
+        if not new_password or (new_password != new_password2) or (len(new_password) < 8):
+            print """If the page simply refreshes, your inputs may not match, or your chosen password
+                    is less than 8 characters.<br>
+                    Enter new password:
+                    <form method="post" action="/login?reset=%s">
+                    <table>
+                    <tr><td>Password:</td><td><input type="password" name="new_pass"></td></tr>
+                    <tr><td>Confirm:</td><td><input type="password" name="new_pass2"></td></tr>
+                    <tr><td><input type="submit" value="Submit"></td><td>&nbsp;</td></tr>
+                    </table>
+                    </form>
+                  """ % (reset)
+        else:
+            pw_hash = create_password_hash(new_password)
+            mysql.execute_mysql("""UPDATE users SET verified = '0', password = %s WHERE verified = %s;"""
+                                    , (pw_hash, reset,) )
+            print """Password has been updated! <a href="/login">Log in!</a>"""
+        sys.exit()
+        
 
     #CHECK COOKIE
     session = get_cookie()
