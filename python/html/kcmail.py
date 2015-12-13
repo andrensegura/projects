@@ -44,7 +44,7 @@ Andre Segura
     except SMTPException:
        print "Error: unable to send email"
 
-def email_password_recovery(address, key, recov_link)
+def email_password_recovery(address, recov_link):
     sender = "andre@keycellar.com"
     receivers = [address]
     msg = MIMEText("""
@@ -56,15 +56,15 @@ reset for the account using address "%s". If this was sent to you
 in error, you can disregard this message and no changes will be
 made.
 
-If, however, you <i>did</i> request a password reset, please click
-on the link below to begin. You will also need this key: %s
-%
+If, however, you *did* request a password reset, please click
+on the link below to begin. 
+%s
 
 Thank you, and let me know if you have any trouble!
 
 
 Andre
-""" % (address, key, recov_link)
+""" % (address, recov_link) )
 
     #the following three lines are to make sure that the email is RFC compliant.
     msg['To'] = email.utils.formataddr(('', address))
