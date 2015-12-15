@@ -11,6 +11,8 @@ TRADES        = 5
 VERIFIED      = 6
 LOGGED_IN     = 7
 AVATAR        = 8
+FRIENDS       = 9
+HIDE_EMAIL    = 10
 
 #table: mail
 ID        = 0
