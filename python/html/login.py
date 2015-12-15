@@ -104,6 +104,11 @@ def main():
         if login(username,password):
             up_email = form.getvalue("up_email", "")
             up_steam = form.getvalue("up_steam", "")
+            up_hide = form.getvalue("hide_email", "")
+            if up_hide:
+                up_hide = 1
+            mysql.execute_mysql("""UPDATE users SET hide_email=%s WHERE username = %s;"""
+                        , (up_hide, username,) )
             if re.match(r"[^@]+@[^@]+\.[^@]+", up_email):
                 mysql.execute_mysql("""UPDATE users SET email = %s WHERE username = %s;"""
                         , (up_email, username,) )
