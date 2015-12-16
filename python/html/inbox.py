@@ -34,9 +34,9 @@ def print_mail(mail):
     mail.reverse()
     for message in mail:
         if message[IS_READ] or message[SENDER] == username:
-            print """<table style="white-space:pre-wrap;" class="highlight">"""
+            print """<table class="read_message">"""
         else:
-            print """<table style="white-space:pre-wrap;" bgcolor="#f2f2f2" class="highlight">"""
+            print """<table class="unread_message">"""
         print """
             <tr><td>From:</td><td valign="left" width="100%%">%s</td></tr>
             <tr><td>To:</td><td valign="left">%s</td></tr>
@@ -59,7 +59,7 @@ def print_mail(mail):
                         <input type="submit" value="Mark as read">
                     </form>
                     """ % (message[ID])
-        print "<br><hr><br>"
+        print "<br><br>"
 
 def print_compose(user, id=0, pm_to=""):
     if id == 0:
