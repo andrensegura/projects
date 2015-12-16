@@ -22,7 +22,7 @@ def owns_profile(u_info, key):
     else:
         return False 
 
-def print_profile(info, sess_key, visitor):
+def print_profile(info, sess_key):
     print """<div class="profile_details">"""
     print """<h1><img src="%s" alt=""> %s</h1>""" % (user_info[AVATAR] if user_info[AVATAR]
              else "/pics/princess.png", user_info[USERNAME])
@@ -39,7 +39,7 @@ def print_profile(info, sess_key, visitor):
     if owns_profile(user_info, sess_key):
         print_update_options(info)
     elif sess_key != "none" :
-        print_contact_opts(info, visitor)
+        print_contact_opts(info, sess_key)
 
     print """</div>"""
 
@@ -47,7 +47,25 @@ def print_contact_opts(info, sess_key):
     visitor = mysql.execute_mysql("""SELECT * FROM users WHERE logged_in = %s"""
                    , (session["session"].value,))[0]
 
-    friend = form.getvalue("friend", "")
+    print """<form method="post" action="/u/%s"
+            style="display:inline;margin:0px;padding:0px;">""" % (info[USERNAME])
+    if info[USERNAME] not in visitor[FRIENDS]:
+        print """<input type="submit" name="friend" value="+Friends"
+                style="background-color:green;color:white;">"""
+    else:
+        print """<input type="submit" name="friend" value="-Friends"
+                style="background-color:red;color:white;">"""
+    print """</form>"""
+    print """<form method="post" action="/inbox" style="display:inline;margin:0px;padding:0px;">
+             <input type="hidden" name="id" value="new">
+             <input type="hidden" name="pm" value="%s">
+             <input type="submit" value="Message">
+             </form>""" % (info[USERNAME])
+
+def update_friends(info, friend, key):
+    visitor = mysql.execute_mysql("""SELECT * FROM users WHERE logged_in = %s"""
+                   , (key,))[0]
+
     if friend == "+Friends":
         #add friend
         from ast import literal_eval
@@ -65,19 +83,7 @@ def print_contact_opts(info, sess_key):
         visitor_friends.remove(info[USERNAME])
         mysql.execute_mysql("""UPDATE users SET friends=%s WHERE username=%s;""",
                             (str(visitor_friends), visitor[USERNAME]) )
-
-    #refresh visitor
-    visitor = mysql.execute_mysql("""SELECT * FROM users WHERE logged_in = %s"""
-                   , (session["session"].value,))[0]
-
-    print """<form method="post" action="/u/%s"
-            style="display:inline;margin:0px;padding:0px;">""" % (info[USERNAME])
-    if info[USERNAME] not in visitor[FRIENDS]:
-        print """<input type="submit" name="friend" value="+Friends">"""
-    else:
-        print """<input type="submit" name="friend" value="-Friends">"""
-    print """</form>"""
-    print """<input type="submit" name="new_message" value="Message"> """
+    print """Location: http://keycellar.com/u/%s""" % (info[USERNAME])
 
 def print_tradeables(info):
     print """<div class="tradeables">"""
@@ -117,6 +123,7 @@ def print_update_options(info):
 #GET VARIABLES
 form = cgi.FieldStorage()
 username = form.getvalue("user", "")
+friend = form.getvalue("friend", "")
 
 #CHECK COOKIE
 session = Cookie.SimpleCookie()
@@ -130,15 +137,21 @@ try:
 except ((Cookie.CookieError, KeyError)):
     session = ""
 
+
+
 #DO STUFF WITH VARS
 #PRINT STUFF TO GET VARS
 user_info = check_user(username)
+
+if friend:
+    update_friends(user_info, friend, session["session"].value)
+
 print_header()
 if user_info == "No such user here.":
     print user_info #which is just "No such user here."
 else:
     if session:
-        print_profile(user_info, session["session"].value, result[0][USERNAME])
+        print_profile(user_info, session["session"].value)
     else:
         print_profile(user_info, "none")
     print_tradeables(user_info)
