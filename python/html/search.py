@@ -21,10 +21,10 @@ if query:
                                     FROM users WHERE games LIKE %s;""", (s_query,) )
     if result:
         USERNAME=0;TRADES=1;GAMES=2
-        print """<table style="border:3px solid silver; border-collapse: collapse;">
-                <tr style="background-color:silver;"><td><b>Username</b></td>
-                <td><b>Trades</b></td>
-                <td><b>Matches</b></td></tr>"""
+        print """<table class="search_table">
+                <tr><td><b>Username</b></td>
+                    <td><b>Trades</b></td>
+                    <td><b>Matches</b></td></tr>"""
         for user in result:
             from ast import literal_eval
             games_list = []
