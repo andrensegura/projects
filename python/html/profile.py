@@ -69,11 +69,20 @@ def print_friends(friends_list):
         return
     from ast import literal_eval
     friends_list = literal_eval(friends_list)
+
     print """<br><hr style="height:5px;border:none;color:silver;background-color:silver;">"""
     print """<table>
              <tr><td colspan="2"><b>Friends</b></td><td></tr>"""
     for friend in friends_list:
-        print """<tr><td>%s</td><td><a href="/u/%s">%s</a></td></tr>""" % ("[avatar]", friend, friend)
+        avatar = mysql.execute_mysql("""SELECT avatar FROM users WHERE username = %s;""", (friend,) )
+        if avatar[0][0] != "":
+            avatar = """<a href="/u/%s">
+                    <img width="32" height="32" src="%s"></a>""" % (friend, avatar[0][0])
+        else:
+            avatar = """<a href="/u/%s">
+                    <img width="32" height="32" src="/pics/princess.png"></a>""" % (friend)
+        print """<tr><td>%s</td><td valign="bottom left">
+                 <a href="/u/%s">%s</a></td></tr>""" % (avatar, friend, friend)
     print "</table>"
 
 def update_friends(info, friend, key):
