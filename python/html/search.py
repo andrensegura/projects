@@ -4,7 +4,6 @@ import cgitb; cgitb.enable() #for troubleshooting
 import mysql
 from functions import print_header, print_nav
 
-
 def get_search_results(query):
     pass
 
@@ -18,13 +17,23 @@ query = form.getvalue("search", "")
 if query:
     print "<h2>Search: \"%s\"</h2>" % (query)
     s_query = "%" + query + "%"
-    result = mysql.execute_mysql("""SELECT username, trades FROM users WHERE games LIKE %s;""", (s_query,) )
-
+    result = mysql.execute_mysql("""SELECT username, trades, games
+                                    FROM users WHERE games LIKE %s;""", (s_query,) )
     if result:
-        print "<table>"
+        USERNAME=0;TRADES=1;GAMES=2
+        print """<table style="border:3px solid silver; border-collapse: collapse;">
+                <tr style="background-color:silver;"><td><b>Username</b></td>
+                <td><b>Trades</b></td>
+                <td><b>Matches</b></td></tr>"""
         for user in result:
-            print ("""<tr><td><li><a href="/u/%s">%s</a></td><td>(trades: %s)</td></tr>"""
-                    % (user[0], user[0], user[1]) )
+            from ast import literal_eval
+            games_list = []
+            for game in literal_eval(user[GAMES]):
+                if query.lower() in game[0].lower():
+                    games_list.append(str("""<a href="%s">%s</a>""" % (game[1], game[0])))
+            print ("""<tr class="highlight"><td valign="top"><a href="/u/%s">%s</a></td><td>%s</td>
+                        <td valign="top">%s</td></tr>"""
+                    % (user[USERNAME], user[USERNAME], user[TRADES], games_list ) )
         print "</table>"
     else:
         print "No results for \"%s\" found." % (query)
