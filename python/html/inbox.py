@@ -33,6 +33,12 @@ def print_mail(mail):
     mail = sorted(mail, key = lambda x: x[TIME])
     mail.reverse()
     for message in mail:
+        if message[SENDER] != username:
+            sender = """<a href="/u/%s">%s</a>""" % (message[SENDER], message[SENDER])
+            recipient = message[RECIPIENT]
+        else:
+            sender = message[SENDER]
+            recipient = """<a href="/u/%s">%s</a>""" % (message[RECIPIENT], message[RECIPIENT])
         if message[IS_READ] or message[SENDER] == username:
             print """<table class="read_message">"""
         else:
@@ -43,7 +49,7 @@ def print_mail(mail):
             <tr><td>Time:</td><td valign="left">%s</td></tr>
             <tr><td valign="top">Subject:</td><td valign="left">%s</td></tr>
             <tr><td valign="top">Message:</td><td valign="left">%s</td></tr>
-            </table>""" % (message[SENDER], message[RECIPIENT], message[TIME], message[SUBJECT], message[BODY])
+            </table>""" % (sender, recipient, message[TIME], message[SUBJECT], message[BODY])
         if message[RECIPIENT] == username:
             print """
                 <form method="post" style="display:inline;margin:0px;padding:0px;" action="/inbox">
