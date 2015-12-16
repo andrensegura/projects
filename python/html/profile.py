@@ -24,8 +24,8 @@ def owns_profile(u_info, key):
 
 def print_profile(info, sess_key):
     print """<div class="profile_details">"""
-    print """<h1><img src="%s" alt=""> %s</h1>""" % (user_info[AVATAR] if user_info[AVATAR]
-             else "/pics/princess.png", user_info[USERNAME])
+    print """<h1><img src="%s" alt=""> %s</h1>""" % (info[AVATAR] if info[AVATAR]
+             else "/pics/princess.png", info[USERNAME])
     print """
         <table>
         %s
@@ -36,10 +36,12 @@ def print_profile(info, sess_key):
                % (info[EMAIL], "" if info[VERIFIED] == "0" else " (not verified)") if not info[HIDE_EMAIL]
                else "", info[TRADES], info[STEAM_PROFILE] )
     
-    if owns_profile(user_info, sess_key):
+    if owns_profile(info, sess_key):
+        print_friends(info[FRIENDS])
         print_update_options(info)
     elif sess_key != "none" :
         print_contact_opts(info, sess_key)
+        print_friends(info[FRIENDS])
 
     print """</div>"""
 
@@ -61,6 +63,18 @@ def print_contact_opts(info, sess_key):
              <input type="hidden" name="pm" value="%s">
              <input type="submit" value="Message">
              </form>""" % (info[USERNAME])
+
+def print_friends(friends_list):
+    if not friends_list:
+        return
+    from ast import literal_eval
+    friends_list = literal_eval(friends_list)
+    print """<br><hr style="height:5px;border:none;color:silver;background-color:silver;">"""
+    print """<table>
+             <tr><td colspan="2"><b>Friends</b></td><td></tr>"""
+    for friend in friends_list:
+        print """<tr><td>%s</td><td><a href="/u/%s">%s</a></td></tr>""" % ("[avatar]", friend, friend)
+    print "</table>"
 
 def update_friends(info, friend, key):
     visitor = mysql.execute_mysql("""SELECT * FROM users WHERE logged_in = %s"""
