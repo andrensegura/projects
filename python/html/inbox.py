@@ -30,11 +30,13 @@ def get_received(mail, user):
 
 #PRINT MAIL
 def print_mail(mail):
+    mail = sorted(mail, key = lambda x: x[TIME])
+    mail.reverse()
     for message in mail:
         if message[IS_READ] or message[SENDER] == username:
-            print """<table style="white-space:pre-wrap;">"""
+            print """<table style="white-space:pre-wrap;" class="highlight">"""
         else:
-            print """<table style="white-space:pre-wrap;" bgcolor="#f2f2f2">"""
+            print """<table style="white-space:pre-wrap;" bgcolor="#f2f2f2" class="highlight">"""
         print """
             <tr><td>From:</td><td valign="left" width="100%%">%s</td></tr>
             <tr><td>To:</td><td valign="left">%s</td></tr>
@@ -59,7 +61,7 @@ def print_mail(mail):
                     """ % (message[ID])
         print "<br><hr><br>"
 
-def print_compose(user, id=0):
+def print_compose(user, id=0, pm_to=""):
     if id == 0:
         mail = mysql.execute_mysql("""SELECT * FROM mail WHERE id = %s;"""
             , (id,) )[0] 
@@ -86,7 +88,7 @@ def print_compose(user, id=0):
                     <td><input type="submit" name="send" value="Send"></td></tr>
             </table>
         </form>
-        """ % (user, user, mail[SENDER], mail[SUBJECT], mail[BODY])
+        """ % (user, user, pm_to if pm_to else mail[SENDER], mail[SUBJECT], mail[BODY])
 
 username = get_session_user()
 form = cgi.FieldStorage()
@@ -131,7 +133,8 @@ if send:
                             VALUES (%s, %s, %s, %s, %s);""", (sender, recipient, subject, body, '0'))
         print "Sent!"
 elif compose == "new":
-        print_compose(username) 
+        to = form.getvalue("pm", "")
+        print_compose(username, 0, pm_to=to) 
 elif compose:
         print_compose(username, compose) 
 else:
@@ -145,7 +148,7 @@ else:
         elif sort_by == "received":
             sorted_mail = get_received(mail, username)
         elif sort_by == "all":
-            sorted_mail = mail 
+            sorted_mail = list(mail)
         else:
             sorted_mail = get_unread(mail, username)
             if not sorted_mail:
