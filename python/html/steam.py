@@ -31,13 +31,12 @@ def get_inventory(profile_link):
     games_list = []
     try:
         for key in inventory_json['rgDescriptions']:
-            game_title = inventory_json['rgDescriptions'][key]['name']
             try:
-                game_id = inventory_json['rgDescriptions'][key]['actions'][0]['link']
-                game_id = games_id.split('/')[-1]
+                game_link = inventory_json['rgDescriptions'][key]['actions'][0]['link']
             except KeyError:
                 game_link = ""
-            games_list.append((game_title, game_id))
+            game_info = get_game_info(game_link)
+            games_list.append(game_info)
         games_list.sort()
         return games_list
     except:
@@ -77,3 +76,24 @@ def steam_search(query):
         all_games.append([app_title, app_id, app_img])
 
     return all_games
+
+def get_game_info(url):
+    from lxml import html, etree
+    import requests
+
+    game_info = []
+    page = requests.get(url)
+    tree = html.fromstring(page.content)
+
+    title = tree.xpath('//div[@class="apphub_AppName"]/text()')[0]
+    game_info.append(title.encode('ascii', 'ignore'))
+
+    game_info.append(url.split('/')[-2])
+
+    img = tree.xpath('//img[@class="game_header_image_full"]')[0].get("src")
+    game_info.append(img.encode('ascii', 'ignore'))
+
+
+    return tuple(game_info)
+
+
