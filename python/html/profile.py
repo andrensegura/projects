@@ -7,7 +7,6 @@ import cgi
 import cgitb; cgitb.enable() #for troubleshooting
 from config import USERNAME, EMAIL, TRADES, STEAM_PROFILE, LOGGED_IN, VERIFIED
 from config import AVATAR, GAMES, HIDE_EMAIL, FRIENDS
-from subprocess import Popen, PIPE, STDOUT
 
 #CHECK USER
 def check_user(user):
@@ -141,6 +140,7 @@ def print_update_options(info):
              <br>
          """ % (info[USERNAME], "checked" if info[HIDE_EMAIL] else "")
     print """<a href="/steam.php">Add tradeable games to library via Steam.</a>"""
+    print """<a href="/add">Add games to library manually.</a>"""
     print """</div>"""
 
 #GET VARIABLES
