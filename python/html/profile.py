@@ -115,7 +115,7 @@ def print_tradeables(info):
         from ast import literal_eval
         games_list = literal_eval(games_list)
         for game in games_list:
-            print """<li><a href="%s">%s</a><br>""" % (game[1], game[0])
+            print """<li><a href="http://store.steampowered.com/app/%s">%s</a><br>""" % (game[1], game[0])
     else:
         print "No games in inventory or inventory is private."
     print """</div>"""
@@ -139,8 +139,9 @@ def print_update_options(info):
              </form>
              <br>
          """ % (info[USERNAME], "checked" if info[HIDE_EMAIL] else "")
-    print """<a href="/steam.php">Add tradeable games to library via Steam.</a>"""
-    print """<a href="/add">Add games to library manually.</a>"""
+    print """<a href="/steam.php">Add tradeable games to library via Steam.</a>
+            <br>
+            <a href="/add">Add games to library manually.</a>"""
     print """</div>"""
 
 #GET VARIABLES
