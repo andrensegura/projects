@@ -32,10 +32,10 @@ def get_inventory(profile_link):
     try:
         for key in inventory_json['rgDescriptions']:
             try:
-                game_link = inventory_json['rgDescriptions'][key]['actions'][0]['link']
+                game_id = inventory_json['rgDescriptions'][key]['actions'][0]['link'].split('/')[-2]
             except KeyError:
-                game_link = ""
-            game_info = get_game_info(game_link)
+                game_id = ""
+            game_info = get_game_info(game_id)
             games_list.append(game_info)
         games_list.sort()
         return games_list
@@ -77,9 +77,11 @@ def steam_search(query):
 
     return all_games
 
-def get_game_info(url):
+def get_game_info(id):
     from lxml import html, etree
     import requests
+
+    url = "http://store.steampowered.com/app/%s/" % (id)
 
     game_info = []
     page = requests.get(url)
@@ -88,7 +90,7 @@ def get_game_info(url):
     title = tree.xpath('//div[@class="apphub_AppName"]/text()')[0]
     game_info.append(title.encode('ascii', 'ignore'))
 
-    game_info.append(url.split('/')[-2])
+    game_info.append(id)
 
     img = tree.xpath('//img[@class="game_header_image_full"]')[0].get("src")
     game_info.append(img.encode('ascii', 'ignore'))
