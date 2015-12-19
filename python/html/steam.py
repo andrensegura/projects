@@ -1,10 +1,12 @@
 #!/usr/bin/python
-import pycurl, json
-from StringIO import StringIO
+import json
 from config import STEAM_KEY
 
 
 def get_steam_json(url):
+    from StringIO import StringIO
+    import pycurl
+
     buffer = StringIO()
     c= pycurl.Curl()
     #must have inventory settings set to public and "keep steam gift inventory private"  unchecked
@@ -31,10 +33,11 @@ def get_inventory(profile_link):
         for key in inventory_json['rgDescriptions']:
             game_title = inventory_json['rgDescriptions'][key]['name']
             try:
-                game_link = inventory_json['rgDescriptions'][key]['actions'][0]['link']
+                game_id = inventory_json['rgDescriptions'][key]['actions'][0]['link']
+                game_id = games_id.split('/')[-1]
             except KeyError:
                 game_link = ""
-            games_list.append((game_title, game_link))
+            games_list.append((game_title, game_id))
         games_list.sort()
         return games_list
     except:
@@ -52,3 +55,25 @@ def get_profile(steam_id_64):
     # lots of stuff can be found in this!
     profile_link = profile_json['response']['players'][0]
     return profile_link
+
+
+# This returns a list of games found by steams search function
+# list structure is [title, id, img]
+def steam_search(query):
+    from lxml import html, etree
+    import requests
+
+    all_games = []
+    url = "http://store.steampowered.com/search/?term=%s" % (query)
+    page = requests.get(url)
+    tree = html.fromstring(page.content)
+
+    app_data = tree.xpath('//div[@id="search_result_container"]/div/a')
+
+    for app in app_data:
+        app_id = app.get("data-ds-appid").encode('ascii', 'ignore')
+        app_img = next(app.iter("img")).get("src").encode('ascii', 'ignore')
+        app_title = next(app.iter("span")).text.encode('ascii', 'ignore')
+        all_games.append([app_title, app_id, app_img])
+
+    return all_games
