@@ -133,6 +133,9 @@ def main():
                     except:
                         pass
                     games_list.sort()
+                    for game in games_list:
+                        if not game:
+                            games_list.remove(game)
                     mysql.execute_mysql("""UPDATE users SET steam_games = %s WHERE username = %s;""",
                                     (str(games_list), username) )
             print "Location: http://keycellar.com/u/%s\n" % (username)
