@@ -87,7 +87,6 @@ def get_game_info(id):
     page = requests.get(url)
     tree = html.fromstring(page.content)
 
-    print etree.tostring(tree)
     try:
         title = tree.xpath('//div[@class="apphub_AppName"]/text()')[0]
         game_info.append(title.encode('ascii', 'ignore'))
