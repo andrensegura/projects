@@ -5,8 +5,7 @@ from functions import print_header, print_html_file
 import Cookie, os
 import cgi
 import cgitb; cgitb.enable() #for troubleshooting
-from config import USERNAME, EMAIL, TRADES, STEAM_PROFILE, LOGGED_IN, VERIFIED
-from config import AVATAR, STEAM_GAMES, HIDE_EMAIL, FRIENDS
+from config import * 
 
 #CHECK USER
 def check_user(user):
@@ -110,20 +109,29 @@ def update_friends(info, friend, key):
 def print_tradeables(info):
     TITLE=0; ID=1; PIC=2
     print """<div class="tradeables">"""
-    print "<br><b>Games Available for Trade:</b><br>"
-    games_list = info[STEAM_GAMES] 
-    if games_list:
-        from ast import literal_eval
-        games_list = literal_eval(games_list)
-        print "<table>"
-        for game in games_list:
-            print """<tr><td><img src="%s" width="120" height="45" alt=""></td>
-                     <td valign="center">
-                        <a href="http://store.steampowered.com/app/%s"><b>%s</b></a></td>
-                     </td></tr>""" % (game[PIC], game[ID], game[TITLE])
-        print "</table>"
-    else:
-        print "No games in inventory or inventory is private."
+    print "<h2>Games Available for Trade</h2><hr>"
+
+    for inventory in range(STEAM_GAMES, WISHLIST+1):
+        if inventory == STEAM_GAMES:
+            print "<h3>Games added through Steam:</h3>"
+        elif inventory == ADDED_GAMES:
+            print "<h3>Games added manually:</h3>"
+        elif inventory == WISHLIST:
+            print "<h3>Wishlist:</h3>"
+        games_list = info[inventory] 
+        if games_list:
+            from ast import literal_eval
+            games_list = literal_eval(games_list)
+            print "<table>"
+            for game in games_list:
+                print """<tr><td><img src="%s" width="120" height="45" alt=""></td>
+                         <td valign="center">
+                            <a href="http://store.steampowered.com/app/%s"><b>%s</b></a></td>
+                         </td></tr>""" % (game[PIC], game[ID], game[TITLE])
+            print "</table>"
+        else:
+            print "No games in this inventory."
+        print "<hr>"
     print """</div>"""
 
 def print_update_options(info):
@@ -148,6 +156,8 @@ def print_update_options(info):
     print """<a href="/steam.php">Add tradeable games to library via Steam.</a>
             <br>
             <a href="/add">Add games to library manually.</a>"""
+            <br>
+            <a href="/wishlist">Add games to wishlist.</a>"""
     print """</div>"""
 
 #GET VARIABLES

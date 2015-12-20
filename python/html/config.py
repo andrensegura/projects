@@ -7,13 +7,14 @@ PASSWORD      = 1
 EMAIL         = 2
 STEAM_GAMES   = 3
 ADDED_GAMES   = 4
-STEAM_PROFILE = 5
-TRADES        = 6
-VERIFIED      = 7
-LOGGED_IN     = 8
-AVATAR        = 9
-FRIENDS       = 10
-HIDE_EMAIL    = 11
+WISHLIST      = 5
+STEAM_PROFILE = 6
+TRADES        = 7
+VERIFIED      = 8
+LOGGED_IN     = 9
+AVATAR        = 10
+FRIENDS       = 11
+HIDE_EMAIL    = 12
 
 #table: mail
 ID        = 0
