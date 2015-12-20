@@ -14,7 +14,7 @@ if not username:
 
 def get_games_list():
     print "<h2>Add games to %s's <b>wishlist</b>:</h2>" % (username)
-    print """<form method="post" action="/add">
+    print """<form method="post" action="/wishlist">
             Enter your list of games, separated by newlines:
             <br>
             <textarea cols="50" rows="20" name="games"></textarea>
@@ -81,7 +81,11 @@ def add_games(amt_games, user):
 
     for i in range(int(amt_games)):
         game_id = form.getvalue(str(i), "")
-        to_add.append(get_game_info(game_id))
+        game = get_game_info(game_id)
+        if game:
+           to_add.append(get_game_info(game))
+        else:
+            print "Game ID %s probably requires an age check." % (game_id)
 
     if games_list:
         games_list = literal_eval(games_list)
