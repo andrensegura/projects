@@ -124,11 +124,8 @@ def main():
                 #get tradeable games and catalog them
                 games_list = steam.get_inventory(str(up_steam['profileurl'])) #doesn't work with unicode
                 if games_list:
-                    #result =  mysql.execute_mysql("""SELECT username, CONCAT(games, %s) games FROM users
-                    #                   WHERE username = %s;"""
-                    #                   , (games_list, username) )
                     try:
-                        result = mysql.execute_mysql("""SELECT games FROM users WHERE username = %s;"""
+                        result = mysql.execute_mysql("""SELECT steam_games FROM users WHERE username = %s;"""
                                                 , (username,) )
                         from ast import literal_eval
                         result = literal_eval(result[0][1])
@@ -136,7 +133,7 @@ def main():
                     except:
                         pass
                     games_list.sort()
-                    mysql.execute_mysql("""UPDATE users SET games = %s WHERE username = %s;""",
+                    mysql.execute_mysql("""UPDATE users SET steam_games = %s WHERE username = %s;""",
                                     (str(games_list), username) )
             print "Location: http://keycellar.com/u/%s\n" % (username)
             
