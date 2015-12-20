@@ -155,7 +155,7 @@ def print_update_options(info):
          """ % (info[USERNAME], "checked" if info[HIDE_EMAIL] else "")
     print """<a href="/steam.php">Add tradeable games to library via Steam.</a>
             <br>
-            <a href="/add">Add games to library manually.</a>"""
+            <a href="/add">Add games to library manually.</a>
             <br>
             <a href="/wishlist">Add games to wishlist.</a>"""
     print """</div>"""
