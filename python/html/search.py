@@ -17,8 +17,8 @@ query = form.getvalue("search", "")
 if query:
     print "<h2>Search: \"%s\"</h2>" % (query)
     s_query = "%" + query + "%"
-    result = mysql.execute_mysql("""SELECT username, trades, games
-                                    FROM users WHERE games LIKE %s;""", (s_query,) )
+    result = mysql.execute_mysql("""SELECT username, trades, steam_games
+                                    FROM users WHERE steam_games LIKE %s;""", (s_query,) )
     if result:
         USERNAME=0;TRADES=1;GAMES=2
         print """<table class="search_table">
