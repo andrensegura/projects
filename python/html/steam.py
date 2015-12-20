@@ -87,15 +87,17 @@ def get_game_info(id):
     page = requests.get(url)
     tree = html.fromstring(page.content)
 
-    title = tree.xpath('//div[@class="apphub_AppName"]/text()')[0]
-    game_info.append(title.encode('ascii', 'ignore'))
-
-    game_info.append(id)
-
-    img = tree.xpath('//img[@class="game_header_image_full"]')[0].get("src")
-    game_info.append(img.encode('ascii', 'ignore'))
-
-
+    print etree.tostring(tree)
+    try:
+        title = tree.xpath('//div[@class="apphub_AppName"]/text()')[0]
+        game_info.append(title.encode('ascii', 'ignore'))
+    
+        game_info.append(id)
+    
+        img = tree.xpath('//img[@class="game_header_image_full"]')[0].get("src")
+        game_info.append(img.encode('ascii', 'ignore'))
+    except:
+        pass
     return tuple(game_info)
 
 
