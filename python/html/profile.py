@@ -6,7 +6,7 @@ import Cookie, os
 import cgi
 import cgitb; cgitb.enable() #for troubleshooting
 from config import USERNAME, EMAIL, TRADES, STEAM_PROFILE, LOGGED_IN, VERIFIED
-from config import AVATAR, GAMES, HIDE_EMAIL, FRIENDS
+from config import AVATAR, STEAM_GAMES, HIDE_EMAIL, FRIENDS
 
 #CHECK USER
 def check_user(user):
@@ -108,14 +108,20 @@ def update_friends(info, friend, key):
     print """Location: http://keycellar.com/u/%s""" % (info[USERNAME])
 
 def print_tradeables(info):
+    TITLE=0; ID=1; PIC=2
     print """<div class="tradeables">"""
     print "<br><b>Games Available for Trade:</b><br>"
-    games_list = info[GAMES] 
+    games_list = info[STEAM_GAMES] 
     if games_list:
         from ast import literal_eval
         games_list = literal_eval(games_list)
+        print "<table>"
         for game in games_list:
-            print """<li><a href="http://store.steampowered.com/app/%s">%s</a><br>""" % (game[1], game[0])
+            print """<tr><td><img src="%s" width="120" height="45" alt=""></td>
+                     <td valign="center">
+                        <a href="http://store.steampowered.com/app/%s"><b>%s</b></a></td>
+                     </td></tr>""" % (game[PIC], game[ID], game[TITLE])
+        print "</table>"
     else:
         print "No games in inventory or inventory is private."
     print """</div>"""
