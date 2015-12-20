@@ -5,14 +5,15 @@
 USERNAME      = 0
 PASSWORD      = 1
 EMAIL         = 2
-GAMES         = 3
-STEAM_PROFILE = 4
-TRADES        = 5
-VERIFIED      = 6
-LOGGED_IN     = 7
-AVATAR        = 8
-FRIENDS       = 9
-HIDE_EMAIL    = 10
+STEAM_GAMES   = 3
+ADDED_GAMES   = 4
+STEAM_PROFILE = 5
+TRADES        = 6
+VERIFIED      = 7
+LOGGED_IN     = 8
+AVATAR        = 9
+FRIENDS       = 10
+HIDE_EMAIL    = 11
 
 #table: mail
 ID        = 0
