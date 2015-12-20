@@ -83,7 +83,7 @@ def add_games(amt_games, user):
         game_id = form.getvalue(str(i), "")
         game = get_game_info(game_id)
         if game:
-           to_add.append(get_game_info(game))
+           to_add.append(game)
         else:
             print "Game ID %s probably requires an age check." % (game_id)
 
