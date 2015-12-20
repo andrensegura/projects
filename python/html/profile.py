@@ -124,6 +124,8 @@ def print_tradeables(info):
             games_list = literal_eval(games_list)
             print "<table>"
             for game in games_list:
+                if not game:
+                    continue
                 print """<tr><td><img src="%s" width="120" height="45" alt=""></td>
                          <td valign="center">
                             <a href="http://store.steampowered.com/app/%s"><b>%s</b></a></td>
