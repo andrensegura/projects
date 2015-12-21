@@ -39,7 +39,7 @@ def print_profile(info, sess_key):
         print_update_options(info)
     elif sess_key != "none" :
         print_contact_opts(info, sess_key)
-        print_friends(info[FRIENDS])
+    print_friends(info[FRIENDS])
 
     print """</div>"""
 
@@ -142,6 +142,7 @@ def print_tradeables(info):
     print """</div>"""
 
     print_html_file("show_content.js")
+    print """<script>show_content('first')</script>"""
 
 def print_update_options(info):
     print """<br><hr style="height:5px;border:none;color:silver;background-color:silver;">"""
