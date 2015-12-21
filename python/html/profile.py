@@ -108,21 +108,27 @@ def update_friends(info, friend, key):
 
 def print_tradeables(info):
     TITLE=0; ID=1; PIC=2
-    print """<div class="tradeables">"""
-    print "<h2>Games Available for Trade</h2><hr>"
+    #print """<div class="tradeables">"""
+    print """<div class="tabs">"""
+    #print "<h2>Games Available for Trade</h2><hr>"
+
+    print """<span class="options">
+    <h1 onclick="show_content('first')" id="sel1">Steam</h1>
+    <h1 onclick="show_content('second')" id="sel2">Added</h1>
+    <h1 onclick="show_content('third')" id="sel3">Wishlist</h1>
+    </span><hr>"""
 
     for inventory in range(STEAM_GAMES, WISHLIST+1):
-        if inventory == STEAM_GAMES:
-            print "<h3>Games added through Steam:</h3>"
-        elif inventory == ADDED_GAMES:
-            print "<h3>Games added manually:</h3>"
-        elif inventory == WISHLIST:
-            print "<h3>Wishlist:</h3>"
         games_list = info[inventory] 
         if games_list:
             from ast import literal_eval
             games_list = literal_eval(games_list)
-            print "<table>"
+            if inventory == STEAM_GAMES:
+                print """<span class="tab-content" id="first"><table>"""
+            elif inventory == ADDED_GAMES:
+                print """<span class="tab-content-hidden" id="second"><table>""" 
+            elif inventory == WISHLIST:
+                print """<span class="tab-content-hidden" id="third"><table>""" 
             for game in games_list:
                 if not game:
                     continue
@@ -130,11 +136,12 @@ def print_tradeables(info):
                          <td valign="center">
                             <a href="http://store.steampowered.com/app/%s"><b>%s</b></a></td>
                          </td></tr>""" % (game[PIC], game[ID], game[TITLE])
-            print "</table>"
+            print "</table></span>"
         else:
             print "No games in this inventory."
-        print "<hr>"
     print """</div>"""
+
+    print_html_file("show_content.js")
 
 def print_update_options(info):
     print """<br><hr style="height:5px;border:none;color:silver;background-color:silver;">"""
