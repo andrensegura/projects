@@ -133,8 +133,10 @@ def main():
                     except:
                         pass
                     games_list.sort()
+                    #strange thing when adding games. sometimes it has a bunch of empty 
+                    #games which mess up a bunch of other things.
                     for game in games_list:
-                        if not game:
+                        if len(game) == 0:
                             games_list.remove(game)
                     mysql.execute_mysql("""UPDATE users SET steam_games = %s WHERE username = %s;""",
                                     (str(games_list), username) )
