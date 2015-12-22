@@ -7,8 +7,10 @@ def print_header():
     print "Content-type: text/html\n"
     print_html_file("header.html")
     print_nav()
+    print """<div class="content">"""
 
 def print_nav():
+    print """<div class="navbar">"""
     user = get_session_user()
 
     #mailbox
@@ -17,31 +19,27 @@ def print_nav():
         result = mysql.execute_mysql("""SELECT * FROM mail WHERE recipient = %s AND is_read = '0';"""
                     , (user,) )
         if result: 
-            print """<div align="right"><a href="/inbox">
-                     <img src="/pics/unread.png" alt="inbox" style="width:20px;height:20px;">
-                     </a></div>"""
+            mailbox = """<a href="/inbox">
+                     <img src="/pics/unread.png" alt="inbox" style="width:15px;height:12px;"></a>"""
         else:
-            print """<div align="right"><a href="/inbox">
-                     <img src="/pics/mailbox.png" alt="inbox" style="width:20px;height:20px;">
-                     </a></div>"""
+            mailbox = """<a href="/inbox">
+                     <img src="/pics/mailbox.png" alt="inbox" style="width:15px;height:12px;"></a>"""
     else:
-        print "<br><br>"
-        pass
+        mailbox = ""
 
     
-    print "<hr>"
+    print "<br>"
 
-    print """<form method="post" action="/search" display="inline" style="margin:0px;padding:0px;">"""
-    print """<a href="/">Home</a>"""
-    print "&nbsp;|&nbsp;"
+    print """<form method="post" action="/search">"""
+    print """<ul> <li><a href="/">Home</a>"""
     if user:
-        print """<a href="/u/%s">%s</a>""" % (user, user)
-        print """<a href="/login?action=logout">(logout)</a>"""
-        print "&nbsp;|&nbsp;"
+        print """<li><a href="/u/%s">%s</a>""" % (user, user)
+        print mailbox
+        print """<li><a href="/login?action=logout">logout</a>"""
     else:
-        print """<a href="/login">Log In</a>"""
-        print "&nbsp;|&nbsp;"
-    print """<a href="/register"> Register</a>"""
+        print """<li><a href="/login">Log In</a>"""
+    if not user:
+        print """<li><a href="/register"> Register</a>"""
 
     print """<span style="float:right" >"""
     print """<input type="image" style="height:20px;width:20px;vertical-align:middle"
@@ -50,7 +48,7 @@ def print_nav():
     print """&nbsp;</span>"""
     print """</form>"""
 
-    print "<hr>"
+    print """</div>"""
 
 
 def is_verified(user):
