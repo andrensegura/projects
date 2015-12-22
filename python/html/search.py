@@ -17,8 +17,8 @@ def search(query, type):
         s_query = "%" + query + "%"
         type = """SELECT username, trades, %s FROM users WHERE %s LIKE %%s;""" % (type, type)
         result = mysql.execute_mysql(type, (s_query,) )
+        table_printed=False
         if result:
-            table_printed=False
             for user in result:
                 USERNAME=0;TRADES=1;GAMES=2
                 TITLE=0; APPID=1; IMG=2
