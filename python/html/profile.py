@@ -139,7 +139,7 @@ def print_tradeables(info):
     print """<div class="tabs">"""
     #print "<h2>Games Available for Trade</h2><hr>"
 
-    print """<span class="options">
+    print """<div class="options">
     <button onclick="show_content('first')" id="sel1">Steam</button>
     <button onclick="show_content('second')" id="sel2">Added</button>
     <button onclick="show_content('third')" id="sel3">Wishlist</button>
@@ -154,11 +154,11 @@ def print_tradeables(info):
             games_list = ""
         if games_list:
             if inventory == STEAM_GAMES:
-                print """<span class="tab-content" id="first"><table>"""
+                print """<div class="tab-content" id="first"><table>"""
             elif inventory == ADDED_GAMES:
-                print """<span class="tab-content-hidden" id="second"><table>""" 
+                print """<div class="tab-content-hidden" id="second"><table>""" 
             elif inventory == WISHLIST:
-                print """<span class="tab-content-hidden" id="third"><table>""" 
+                print """<div class="tab-content-hidden" id="third"><table>""" 
             for game in games_list:
                 if not game:
                     continue
@@ -166,16 +166,16 @@ def print_tradeables(info):
                          <td valign="center">
                             <a href="http://store.steampowered.com/app/%s"><b>%s</b></a></td>
                          </td></tr>""" % (game[PIC], game[ID], game[TITLE])
-            print "</table></span>"
+            print "</table></div>"
         else:
             if inventory == STEAM_GAMES:
-                print """<span class="tab-content" id="first"><table>"""
+                print """<div class="tab-content" id="first"><table>"""
             elif inventory == ADDED_GAMES:
-                print """<span class="tab-content-hidden" id="second"><table>"""
+                print """<div class="tab-content-hidden" id="second"><table>"""
             elif inventory == WISHLIST:
-                print """<span class="tab-content-hidden" id="third"><table>"""
+                print """<div class="tab-content-hidden" id="third"><table>"""
 
-            print """<tr><td>No games in this inventory.</td></tr></table></span>"""
+            print """<tr><td>No games in this inventory.</td></tr></table></div>"""
     print """</div>"""
 
     print_html_file("show_content.js")
