@@ -30,6 +30,7 @@ def get_received(mail, user):
 
 #PRINT MAIL
 def print_mail(mail):
+    print """<div class="inbox">"""
     mail = sorted(mail, key = lambda x: x[TIME])
     mail.reverse()
     for message in mail:
@@ -44,15 +45,15 @@ def print_mail(mail):
         else:
             print """<table class="unread_message">"""
         print """
-            <tr><td>From:</td><td valign="left" width="100%%">%s</td></tr>
-            <tr><td>To:</td><td valign="left">%s</td></tr>
-            <tr><td>Time:</td><td valign="left">%s</td></tr>
-            <tr><td valign="top">Subject:</td><td valign="left">%s</td></tr>
-            <tr><td valign="top">Message:</td><td valign="left">%s</td></tr>
+            <tr><td>From:</td><td>%s</td></tr>
+            <tr><td>To:</td><td>%s</td></tr>
+            <tr><td>Time:</td><td>%s</td></tr>
+            <tr><td>Subject:</td><td>%s</td></tr>
+            <tr><td>Message:</td><td>%s</td></tr>
             </table>""" % (sender, recipient, message[TIME], message[SUBJECT], message[BODY])
         if message[RECIPIENT] == username:
             print """
-                <form method="post" style="display:inline;margin:0px;padding:0px;" action="/inbox">
+                <form method="post" action="/inbox">
                     <input type="hidden" name="id" value="%s">
                     <input type="submit" value="Reply">
                 </form>
@@ -60,12 +61,13 @@ def print_mail(mail):
             if not message[IS_READ]:
                 print """
                     &nbsp;
-                    <form method="post" style="display:inline;margin:0px;padding:0px;" action="/inbox">
+                    <form method="post" action="/inbox">
                         <input type="hidden" name="mar" value="%s">
                         <input type="submit" value="Mark as read">
                     </form>
                     """ % (message[ID])
         print "<br><br>"
+    print "</div>"
 
 def print_compose(user, id=0, pm_to=""):
     if id == 0:
@@ -113,13 +115,13 @@ if not is_verified(username):
     import sys; sys.exit()
 
 print """
+    <div class="sort_menu">
     <a href="/inbox?sort=unread">Unread</a> - 
     <a href="/inbox?sort=sent">Sent</a> - 
     <a href="/inbox?sort=received">Received</a> - 
     <a href="/inbox?sort=all">All</a> 
-    <br> <a href="/inbox?id=new">New Message</a>
-    <br>
-    <br>
+    <br> <a href="/inbox?=new">New Message</a>
+    </div>
     """
 
 if send:
