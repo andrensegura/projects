@@ -34,12 +34,11 @@ def print_profile(info, sess_key):
                % (info[EMAIL], "" if info[VERIFIED] == "0" else " (not verified)") if not info[HIDE_EMAIL]
                else "", info[TRADES], info[STEAM_PROFILE] )
     
+    print_friends(info[FRIENDS])
     if owns_profile(info, sess_key):
-        print_friends(info[FRIENDS])
         print_update_options(info)
     elif sess_key != "none" :
         print_contact_opts(info, sess_key)
-    print_friends(info[FRIENDS])
 
     print """</div>"""
 
@@ -63,25 +62,53 @@ def print_contact_opts(info, sess_key):
              </form>""" % (info[USERNAME])
 
 def print_friends(friends_list):
+    print """<div class="friends_list">"""
     if not friends_list:
         return
     from ast import literal_eval
     friends_list = literal_eval(friends_list)
 
-    print """<br><hr style="height:5px;border:none;color:silver;background-color:silver;">"""
     print """<table>
              <tr><td colspan="2"><b>Friends</b></td><td></tr>"""
     for friend in friends_list:
         avatar = mysql.execute_mysql("""SELECT avatar FROM users WHERE username = %s;""", (friend,) )
         if avatar[0][0] != "":
-            avatar = """<a href="/u/%s">
-                    <img width="32" height="32" src="%s"></a>""" % (friend, avatar[0][0])
+                avatar = avatar_info(friend, avatar[0][0])
         else:
-            avatar = """<a href="/u/%s">
-                    <img width="32" height="32" src="/pics/princess.png"></a>""" % (friend)
+                avatar = avatar_info(friend, "/pics/princess.png")
         print """<tr><td>%s</td><td valign="bottom left">
                  <a href="/u/%s">%s</a></td></tr>""" % (avatar, friend, friend)
-    print "</table>"
+    print "</table></div>"
+
+def avatar_info(username, avatar):
+    from ast import literal_eval
+    user_info = check_user(username)
+    if len(user_info[STEAM_GAMES]) > 0:
+        amnt_st = len(literal_eval(user_info[STEAM_GAMES]))
+    else:
+        amnt_st = 0
+    if len(user_info[ADDED_GAMES]) > 0:
+        amnt_add = len(literal_eval(user_info[ADDED_GAMES]))
+    else:
+        amnt_add = 0
+    if len(user_info[WISHLIST]) > 0:
+        amnt_wsh = len(literal_eval(user_info[WISHLIST]))
+    else:
+        amnt_wsh = 0
+    
+    user_info="""<table>
+            <tr><td>Trades:</td><td>%s</td></tr>
+            <tr><td>Steam Games:</td><td>%s</td></tr>
+            <tr><td>Added Games:</td><td>%s</td></tr>
+            <tr><td>Wishlist:</td><td>%s</td></tr>
+            </table>""" % (user_info[TRADES], amnt_st, amnt_add, amnt_wsh)
+
+    avatar = """<span class="avatar">
+                <a href="/u/%s">
+                <img width="32" height="32" src="%s"></a>
+                <div>%s</div></span>
+                """ % (username, avatar, user_info)
+    return avatar
 
 def update_friends(info, friend, key):
     visitor = mysql.execute_mysql("""SELECT * FROM users WHERE logged_in = %s"""
@@ -113,16 +140,19 @@ def print_tradeables(info):
     #print "<h2>Games Available for Trade</h2><hr>"
 
     print """<span class="options">
-    <h1 onclick="show_content('first')" id="sel1">Steam</h1>
-    <h1 onclick="show_content('second')" id="sel2">Added</h1>
-    <h1 onclick="show_content('third')" id="sel3">Wishlist</h1>
-    </span><hr>"""
+    <button onclick="show_content('first')" id="sel1">Steam</button>
+    <button onclick="show_content('second')" id="sel2">Added</button>
+    <button onclick="show_content('third')" id="sel3">Wishlist</button>
+    </span>"""
 
     for inventory in range(STEAM_GAMES, WISHLIST+1):
         games_list = info[inventory] 
-        if games_list:
+        try:
             from ast import literal_eval
             games_list = literal_eval(games_list)
+        except:
+            games_list = ""
+        if games_list:
             if inventory == STEAM_GAMES:
                 print """<span class="tab-content" id="first"><table>"""
             elif inventory == ADDED_GAMES:
@@ -138,14 +168,21 @@ def print_tradeables(info):
                          </td></tr>""" % (game[PIC], game[ID], game[TITLE])
             print "</table></span>"
         else:
-            print "No games in this inventory."
+            if inventory == STEAM_GAMES:
+                print """<span class="tab-content" id="first"><table>"""
+            elif inventory == ADDED_GAMES:
+                print """<span class="tab-content-hidden" id="second"><table>"""
+            elif inventory == WISHLIST:
+                print """<span class="tab-content-hidden" id="third"><table>"""
+
+            print """<tr><td>No games in this inventory.</td></tr></table></span>"""
     print """</div>"""
 
     print_html_file("show_content.js")
     print """<script>show_content('first')</script>"""
 
 def print_update_options(info):
-    print """<br><hr style="height:5px;border:none;color:silver;background-color:silver;">"""
+    print """<br>"""
     print """<div class="update_opts">"""
     print """
              <h2>Update your profile:</h2>
