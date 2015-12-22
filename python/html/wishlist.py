@@ -23,6 +23,7 @@ def get_games_list():
             </form>"""
 
 def show_results(games_list):
+    games_list.strip()
     games_list = games_list.split('\r\n')
 
     print "<h2>Add games to %s's <b>wishlist</b>:</h2>" % (username)
@@ -34,20 +35,22 @@ def show_results(games_list):
         print """<table class="add_games">"""
         results = steam_search(game)
 
-        if not results: 
-            print "No results found ( * A *)"
-            continue
-
         #results.sort()
         print """<tr> 
                 <td colspan="3"><h3 display="inline">Results for %s</h3></td></tr>""" % (game)
         
         checked=""" checked="checked" """
+
         good=False
 
         for app in results:
             
-            if game.lower() not in app[0].lower():
+            import string
+            game_stripped = game.translate(string.maketrans("",""), string.punctuation).lower()
+            game_stripped = "".join(game_stripped.split())
+            app_stripped =  app[0].translate(string.maketrans("",""), string.punctuation).lower()
+            app_stripped = "".join(app_stripped.split())
+            if (game_stripped not in app_stripped):
                 continue
 
             APPTITLE=0
@@ -102,6 +105,7 @@ selected_games = form.getvalue("selected_games", "")
 games = form.getvalue("games", "")
 
 print_header()
+print """<div class="post">"""
 
 if selected_games and selected_games != 0:
     add_games(selected_games, username)
@@ -109,3 +113,5 @@ elif games:
     show_results(games)
 else:
     get_games_list()
+
+print "</div>"
