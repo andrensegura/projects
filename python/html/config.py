@@ -1,4 +1,11 @@
 #####################
+#database credentials
+#####################
+DB_NAME = "andre_kc"
+DB_USER = "andre_kc"
+DB_PASS = "7QS8R8cZ6azd"
+
+#####################
 #database structure
 #####################
 #table: users

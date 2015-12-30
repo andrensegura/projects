@@ -1,6 +1,6 @@
 <?php
     require ('steamauth/steamauth.php');  
-    include 'header.html';
+    include 'html/header.html';
     echo "<hr><a href=\"/\">Home</a><hr>";
     
 	# You would uncomment the line beneath to make it refresh the data every time the page is loaded

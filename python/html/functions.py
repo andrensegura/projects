@@ -5,7 +5,7 @@ def print_html_file(file_name):
 
 def print_header():
     print "Content-type: text/html\n"
-    print_html_file("header.html")
+    print_html_file("html/header.html")
     print_nav()
     print """<div class="content">"""
 

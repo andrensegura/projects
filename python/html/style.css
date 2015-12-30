@@ -1,0 +1,291 @@
+/*##########
+# GENERAL
+##########*/
+
+a {
+    color: black;
+}
+
+.header {
+    background-color: orange;
+    border-left: 3px solid #cc5200;
+    border-right: 3px solid #cc5200;
+}
+
+.navbar {
+    margin-bottom: 10px;
+    background-color: orange; 
+    border-left: 3px solid #cc5200;
+    border-right: 3px solid #cc5200;
+    border-bottom: 3px solid #cc5200;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+.navbar form {
+    border-top: 3px solid #cc5200;
+    margin-bottom: 5px;
+    padding-top: 5px;
+    padding-bottom: 2px;
+}
+
+.navbar ul {
+    list-style-type: none;
+    display: inline;
+    padding-left: 5px;
+}
+
+.navbar ul li:not(:first-child) {
+    border-left: 2px solid #cc5200;
+}
+
+.navbar ul li {
+    display: inline;
+    padding-left: 5px;
+    padding-right: 5px;
+
+}
+
+.navbar img {
+    border: none;
+    background-color: transparent;
+}
+
+
+body { 
+/*    background-image: url('./pics/dragoninja.jpg'); 
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: right; */
+    background-color: black;
+    margin-top: 0px;
+}
+
+
+p {
+    font-size: 18px;
+    margin-left: 10px;
+}
+
+p.block {
+    background-color: silver;
+}
+
+.code {
+    font-size: 16px;
+    background-color: silver;
+    font-family: "Lucida Console", Monaco, monospace;
+}
+
+.content {
+/*    background-color: rgba(255,255,255,0.8); */
+    margin-right: 10%;
+    margin-left: 10%;
+}
+
+.post {
+    border: 5px inset silver;
+    background-color: rgba(220,220,220,0.8);
+}
+
+.profile_details{
+    border-radius: 10px;
+    border: 5px ridge silver;
+    background-color: rgba(220,220,220,0.8);
+    float:left;
+    width:49%;
+    padding:5px;
+    margin-right: 5px;
+}
+
+span.avatar {
+    position: relative;
+}
+
+span.avatar div {
+    display:none;
+}
+
+span.avatar:hover div {
+    display: block;
+    background-color: orange;
+    border: 2px solid black;
+    color: white;
+    position: absolute;
+    left: 35px;
+    bottom: 15px;
+
+}
+
+span.avatar:hover div *{
+    white-space: nowrap;
+    color: white;
+}
+
+span.avatar:hover tr:first-child {
+    width: 100%;
+}
+
+.tradeables {
+    border: 5px solid silver;
+    float:left;
+    width:45%;
+    padding:5px;
+    height:100%;
+    background-color: rgba(220,220,220,0.8);
+}
+
+.update_opts {
+    float:left;
+    width:100%;
+    border-top: 5px solid silver;
+}
+
+.friends_list {
+    float:left;
+    width:100%;
+    border-top: 5px solid silver;
+    margin-top: 5px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+table:hover.highlight {
+  background-color: rgba(220,220,220,0.8);
+  color: #000000;
+}
+
+/*################
+# MESSAGE STUFF
+################*/
+
+.sort_menu {
+    margin-bottom: 10px;
+}
+
+.sort_menu *{
+    color: orange;
+}
+
+.inbox tr td {
+    valign: top;
+}
+
+.inbox form {
+    display: inline;
+    margin: 0px;
+    padding: 0px;
+}
+
+.read_message {
+    white-space:pre-wrap;
+    border:3px solid silver;
+    border-collapse:collapse;
+}
+
+table.read_message tr td:not(:first-child) {
+    width: 100%;
+    background-color:#f2f2f2;
+}
+
+table.read_message tr td:first-child {
+    background-color:silver;
+}
+
+.unread_message {
+    white-space:pre-wrap;
+    border:3px solid #f2f2f2;
+    border-collapse:collapse;
+}
+
+.unread_message textarea {
+    width: 100%;
+    height: 150px;
+}
+
+table.unread_message tr td:not(:first-child) {
+    width: 100%;
+    background-color:silver;
+}
+
+table.unread_message tr td:first-child {
+    background-color:#f2f2f2;
+}
+
+/*##############
+# SEARCH
+##############*/
+
+.search_table {
+    border:3px solid silver;
+    border-collapse: collapse;
+}
+
+table.search_table td {
+    border-bottom: 3px solid silver !important;
+}
+
+table.search_table tr:first-child {
+    background-color:silver;
+}
+table.search_table tr:not(:first-child):hover {
+  background-color: rgba(220,220,220,0.8);
+  color: #000000;
+}
+
+
+/*##################
+# GAMES IN PROFILE
+##################*/
+
+.tabs {
+    border: 5px ridge silver;
+    float:left;
+    width:46%;
+    padding:5px;
+    background-color: rgba(220,220,220,0.8);
+}
+
+
+div.options button {
+    font-size:200%;
+    display:inline;
+    border: 2px solid silver;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    border-bottom: none;
+    outline: none;
+    cursor: hand;
+    margin: 0px 0px 0px 0px;
+}
+
+div.tab-content-hidden table{
+    display:none;
+}
+
+div.tab-content {
+    height: 92%;
+    overflow: auto;
+}
+
+div.tab-content table{
+    display: block;
+    background-color: silver;
+}
+
+div.tab-content table tr td:last-child {
+    width:100%;
+}
+
+div.tab-content table tr:nth-child(odd) {
+    background-color: #cccccc; 
+}
+
+div.tab-content table tr:hover {
+    background-color: #dddddd;
+}
+
+img {
+    border: 1px solid black;
+    background-color:white;
+}
