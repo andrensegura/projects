@@ -1,0 +1,10 @@
+{
+    "0": {
+        "name": "WoW 1.12.1",
+        "path": "../games/wow/WoW.exe"
+    },
+    "1": {
+        "name": "Dolphin",
+        "path": "../games/dolphin/Dolphin-x64/Dolphin.exe"
+    }
+}
